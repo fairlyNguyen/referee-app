@@ -183,10 +183,12 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+  console.log("✅ JS Loaded");
+
+  // ⚠️ replace with your real Firebase config from console
   const firebaseConfig = {
     apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
     authDomain: "fir-demo-a1c99.firebaseapp.com",
@@ -198,33 +200,56 @@
     measurementId: "G-TR0CCTRTGJ"
   };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+   let app, db;
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+    console.log("✅ Firebase initialized");
+  } catch (e) {
+    console.error("❌ Firebase init error:", e);
+    alert("Firebase config error! Check console.");
+  }
 
-    let currentMatchId = null;
-    let currentTourId = null;
+  let currentMatchId = null;
+  let currentTourId = null;
 
-    // Find match
-    document.getElementById("findBtn").addEventListener("click", async () => {
+  // -------- SCORE CHANGER (used by + / - buttons) ----------
+  window.changeScore = function (team, delta) {
+    const input = document.getElementById(team + "Score");
+    let val = parseInt(input.value || "0", 10);
+    val = Math.max(0, val + delta);
+    input.value = val;
+  };
+
+  // -------- FIND BUTTON ----------
+  document.getElementById("findBtn")?.addEventListener("click", async () => {
+    console.log("🔍 Find button clicked");
+    try {
       const matchId = document.getElementById("matchInput").value.trim();
       const tourId = document.getElementById("tourInput").value.trim();
+
       if (!tourId) return alert("Enter a Tournament ID!");
       if (!matchId) return alert("Enter a Match ID!");
 
-      const matchRef = ref(db, "tournaments/" + tourId + "/matches/" + matchId);
+      const path = `tournaments/${tourId}/matches/${matchId}`;
+      console.log("📂 Fetching path:", path);
+
+      const matchRef = ref(db, path);
       const snapshot = await get(matchRef);
 
       if (snapshot.exists()) {
         const data = snapshot.val();
+        console.log("✅ Data found:", data);
+
         currentMatchId = matchId;
         currentTourId = tourId;
+
         document.getElementById("matchId").textContent = matchId;
         document.getElementById("homeName").textContent = data.home || "--";
         document.getElementById("awayName").textContent = data.away || "--";
         document.getElementById("homeScore").value = data.homeScore ?? 0;
         document.getElementById("awayScore").value = data.awayScore ?? 0;
 
-        // Split players if format is "p1-p2"
         const homePlayers = (data.home || "Home1-Home2").split("-");
         const awayPlayers = (data.away || "Away1-Away2").split("-");
 
@@ -233,38 +258,51 @@
         document.getElementById("awayPlayer1").textContent = awayPlayers[0] || "Away --";
         document.getElementById("awayPlayer2").textContent = awayPlayers[1] || "Away --";
       } else {
+        console.warn("⚠️ Match not found at:", path);
         alert("Match not found!");
       }
-    });
-
-    // Update score
-    document.getElementById("updateBtn").addEventListener("click", async () => {
-      if (!currentMatchId || !currentTourId) return alert("Find a match first!");
-
-      const homeScore = parseInt(document.getElementById("homeScore").value) || 0;
-      const awayScore = parseInt(document.getElementById("awayScore").value) || 0;
-
-      const matchRef = ref(db, "tournaments/" + currentTourId + "/matches/" + currentMatchId);
-      await update(matchRef, { homeScore, awayScore });
-      alert("Score updated ✅");
-    });
-
-    // Set Done
-    document.getElementById("doneBtn").addEventListener("click", async () => {
-      if (!currentMatchId || !currentTourId) return alert("Find a match first!");
-
-      const matchRef = ref(db, "tournaments/" + currentTourId + "/matches/" + currentMatchId);
-      await update(matchRef, { state: "DONE" });
-      alert("Match marked as DONE 🏁");
-    });
-
-    // Change score
-    window.changeScore = function(team, delta) {
-      const input = document.getElementById(team + "Score");
-      let value = parseInt(input.value) || 0;
-      value = Math.min(11, Math.max(0, value + delta));
-      input.value = value;
+    } catch (err) {
+      console.error("❌ Find error:", err);
+      alert("Error: " + err.message);
     }
-  </script>
+  });
+
+  // -------- UPDATE SCORE BUTTON ----------
+  document.getElementById("updateBtn")?.addEventListener("click", async () => {
+    console.log("💾 Update button clicked");
+    if (!currentMatchId || !currentTourId) {
+      alert("⚠️ Load a match first using Find!");
+      return;
+    }
+
+    try {
+      const homeScore = parseInt(document.getElementById("homeScore").value, 10) || 0;
+      const awayScore = parseInt(document.getElementById("awayScore").value, 10) || 0;
+      const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+      await update(ref(db, path), { homeScore, awayScore, state: "ONGOING" });
+    } catch (err) {
+      console.error("❌ Update error:", err);
+      alert("Update failed: " + err.message);
+    }
+  });
+
+  // -------- SET DONE BUTTON ----------
+  document.getElementById("doneBtn")?.addEventListener("click", async () => {
+    console.log("🏁 Done button clicked");
+    if (!currentMatchId || !currentTourId) {
+      alert("⚠️ Load a match first using Find!");
+      return;
+    }
+
+    try {
+      const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+      await update(ref(db, path), { state: "FINISHED" });
+      alert("🏁 Match marked as Done!");
+    } catch (err) {
+      console.error("❌ Done error:", err);
+      alert("Failed to mark done: " + err.message);
+    }
+  });
+</script>
 </body>
 </html>
