@@ -2,30 +2,189 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Referee Match Panel</title>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js"></script>
+  <title>Referee Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+    h2 { text-align: center; color: #333; }
+    .card {
+      max-width: 500px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .input-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .input-row button {
+      margin-left: 8px;
+      padding: 8px 12px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    /* Court layout */
+    .court {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      margin: 20px 0;
+      background: #c8e6c9;
+      border: 3px solid #2e7d32;
+      border-radius: 10px;
+    }
+    .court-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #2e7d32;
+    }
+    .court-vertical {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background: #2e7d32;
+    }
+    .player {
+      position: absolute;
+      width: 100px;
+      padding: 6px;
+      text-align: center;
+      background: rgba(255,255,255,0.9);
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    /* Home team positions */
+    .home.top-left { top: 20px; left: 20px; }
+    .home.bottom-left { bottom: 20px; left: 20px; }
+    /* Away team positions */
+    .away.top-right { top: 20px; right: 20px; }
+    .away.bottom-right { bottom: 20px; right: 20px; }
+
+    /* Score controls */
+    .score-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .home { background: #e3f2fd; }
+    .away { background: #fce4ec; }
+    .score-controls {
+      display: flex;
+      align-items: center;
+    }
+    .score-controls button {
+      width: 32px; height: 32px;
+      font-size: 18px;
+      border: none;
+      border-radius: 50%;
+      margin: 0 5px;
+      cursor: pointer;
+      background: #ddd;
+    }
+    .score-controls input {
+      width: 50px;
+      text-align: center;
+      font-size: 16px;
+      padding: 5px;
+    }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #updateBtn { background: #28a745; color: white; }
+    #doneBtn { background: #dc3545; color: white; }
+  </style>
 </head>
 <body>
-  <h1>Referee Panel</h1>
-  
-  <div>
-    <p><strong>Match:</strong> <span id="matchId"></span></p>
-    <p><strong>Home:</strong> <span id="homeName"></span> 
-      <input type="number" id="homeScore" min="0" max="11">
-    </p>
-    <p><strong>Away:</strong> <span id="awayName"></span> 
-      <input type="number" id="awayScore" min="0" max="11">
-    </p>
-    <button id="updateBtn">Update Score</button>
+  <h2>🏓 Referee Panel</h2>
+
+  <div class="card">
+    <!-- Tournament ID -->
+    <div class="input-row">
+      <input type="text" id="tourInput" placeholder="Enter Tournament ID">
+    </div>
+
+    <!-- Match ID -->
+    <div class="input-row">
+      <input type="text" id="matchInput" placeholder="Enter Match ID">
+      <button id="findBtn">Find</button>
+    </div>
+
+    <!-- Match Info -->
+    <div id="matchArea">
+      <p><strong>Match:</strong> <span id="matchId">---</span></p>
+
+      <!-- Court -->
+      <div class="court">
+        <div class="court-line"></div>
+        <div class="court-vertical"></div>
+        <div class="player home top-left" id="homePlayer1">Home --</div>
+        <div class="player home bottom-left" id="homePlayer2">Home --</div>
+        <div class="player away top-right" id="awayPlayer1">Away --</div>
+        <div class="player away bottom-right" id="awayPlayer2">Away --</div>
+      </div>
+
+      <div class="score-box home">
+        <strong>Home:</strong> <span id="homeName">--</span>
+        <div class="score-controls">
+          <button onclick="changeScore('home', -1)">-</button>
+          <input type="number" id="homeScore" min="0" max="11" value="0">
+          <button onclick="changeScore('home', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="score-box away">
+        <strong>Away:</strong> <span id="awayName">--</span>
+        <div class="score-controls">
+          <button onclick="changeScore('away', -1)">-</button>
+          <input type="number" id="awayScore" min="0" max="11" value="0">
+          <button onclick="changeScore('away', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="updateBtn">✅ Update Score</button>
+        <button id="doneBtn">🏁 Set Done</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
@@ -39,39 +198,73 @@
     measurementId: "G-TR0CCTRTGJ"
   };
 
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    // Init Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    let currentMatchId = null;
+    let currentTourId = null;
 
-    // Example: hard-code tournamentId + matchId for referee
-    const tournamentId = "t1";
-    const matchId = "m1";
-    document.getElementById("matchId").innerText = matchId;
+    // Find match
+    document.getElementById("findBtn").addEventListener("click", async () => {
+      const matchId = document.getElementById("matchInput").value.trim();
+      const tourId = document.getElementById("tourInput").value.trim();
+      if (!tourId) return alert("Enter a Tournament ID!");
+      if (!matchId) return alert("Enter a Match ID!");
 
-    const matchRef = db.ref(`tournaments/${tournamentId}/matches/${matchId}`);
+      const matchRef = ref(db, "tournaments/" + tourId + "/matches/" + matchId);
+      const snapshot = await get(matchRef);
 
-    // Listen for updates
-    matchRef.on("value", snapshot => {
-      const data = snapshot.val();
-      if (data) {
-        document.getElementById("homeName").innerText = data.home;
-        document.getElementById("awayName").innerText = data.away;
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        currentMatchId = matchId;
+        currentTourId = tourId;
+        document.getElementById("matchId").textContent = matchId;
+        document.getElementById("homeName").textContent = data.home || "--";
+        document.getElementById("awayName").textContent = data.away || "--";
         document.getElementById("homeScore").value = data.homeScore ?? 0;
         document.getElementById("awayScore").value = data.awayScore ?? 0;
+
+        // Split players if format is "p1-p2"
+        const homePlayers = (data.home || "Home1-Home2").split("-");
+        const awayPlayers = (data.away || "Away1-Away2").split("-");
+
+        document.getElementById("homePlayer1").textContent = homePlayers[0] || "Home --";
+        document.getElementById("homePlayer2").textContent = homePlayers[1] || "Home --";
+        document.getElementById("awayPlayer1").textContent = awayPlayers[0] || "Away --";
+        document.getElementById("awayPlayer2").textContent = awayPlayers[1] || "Away --";
+      } else {
+        alert("Match not found!");
       }
     });
 
     // Update score
-    document.getElementById("updateBtn").addEventListener("click", () => {
-      const newHome = parseInt(document.getElementById("homeScore").value);
-      const newAway = parseInt(document.getElementById("awayScore").value);
-      matchRef.update({
-        homeScore: newHome,
-        awayScore: newAway,
-        state: "IN_PROGRESS"
-      });
+    document.getElementById("updateBtn").addEventListener("click", async () => {
+      if (!currentMatchId || !currentTourId) return alert("Find a match first!");
+
+      const homeScore = parseInt(document.getElementById("homeScore").value) || 0;
+      const awayScore = parseInt(document.getElementById("awayScore").value) || 0;
+
+      const matchRef = ref(db, "tournaments/" + currentTourId + "/matches/" + currentMatchId);
+      await update(matchRef, { homeScore, awayScore });
+      alert("Score updated ✅");
     });
+
+    // Set Done
+    document.getElementById("doneBtn").addEventListener("click", async () => {
+      if (!currentMatchId || !currentTourId) return alert("Find a match first!");
+
+      const matchRef = ref(db, "tournaments/" + currentTourId + "/matches/" + currentMatchId);
+      await update(matchRef, { state: "DONE" });
+      alert("Match marked as DONE 🏁");
+    });
+
+    // Change score
+    window.changeScore = function(team, delta) {
+      const input = document.getElementById(team + "Score");
+      let value = parseInt(input.value) || 0;
+      value = Math.min(11, Math.max(0, value + delta));
+      input.value = value;
+    }
   </script>
 </body>
 </html>
