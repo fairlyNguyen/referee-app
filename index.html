@@ -22,11 +22,12 @@
       display: flex;
       margin-bottom: 12px;
     }
-    .input-row input {
+    .input-row input, .input-row select {
       flex: 1;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 14px;
     }
     .input-row button {
       margin-left: 8px;
@@ -79,6 +80,17 @@
     /* Away team positions */
     .away.top-right { top: 20px; right: 20px; }
     .away.bottom-right { bottom: 20px; right: 20px; }
+
+    /* Highlight server */
+    .first-server {
+      border: 3px solid #ff9800;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+    }
+    .player .serve-icon {
+      margin-left: 6px;
+      font-size: 16px;
+      color: #ff9800;
+    }
 
     /* Score controls */
     .score-box {
@@ -157,6 +169,17 @@
         <div class="player away bottom-right" id="awayPlayer2">Away --</div>
       </div>
 
+      <!-- First Server -->
+      <div class="input-row">
+        <select id="firstServer">
+          <option value="">-- Select First Server --</option>
+          <option value="homePlayer1">Home Player 1</option>
+          <option value="homePlayer2">Home Player 2</option>
+          <option value="awayPlayer1">Away Player 1</option>
+          <option value="awayPlayer2">Away Player 2</option>
+        </select>
+      </div>
+
       <div class="score-box home">
         <strong>Home:</strong> <span id="homeName">--</span>
         <div class="score-controls">
@@ -188,8 +211,8 @@
 
   console.log("✅ JS Loaded");
 
-  // ⚠️ replace with your real Firebase config from console
-  const firebaseConfig = {
+  // ⚠️ replace with your real Firebase config
+    const firebaseConfig = {
     apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
     authDomain: "fir-demo-a1c99.firebaseapp.com",
     databaseURL: "https://fir-demo-a1c99.firebaseio.com",
@@ -200,7 +223,7 @@
     measurementId: "G-TR0CCTRTGJ"
   };
 
-   let app, db;
+  let app, db;
   try {
     app = initializeApp(firebaseConfig);
     db = getDatabase(app);
@@ -213,13 +236,55 @@
   let currentMatchId = null;
   let currentTourId = null;
 
-  // -------- SCORE CHANGER (used by + / - buttons) ----------
+  // -------- Helpers ----------
   window.changeScore = function (team, delta) {
     const input = document.getElementById(team + "Score");
     let val = parseInt(input.value || "0", 10);
     val = Math.max(0, val + delta);
     input.value = val;
   };
+
+  function highlightCurrentServer(playerId) {
+    const allPlayers = ["homePlayer1","homePlayer2","awayPlayer1","awayPlayer2"];
+    allPlayers.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("first-server");
+      const oldIcon = el.querySelector(".serve-icon");
+      if (oldIcon) oldIcon.remove();
+      if (id === playerId) {
+        el.classList.add("first-server");
+        const icon = document.createElement("span");
+        icon.className = "serve-icon";
+        icon.textContent = "🎾";
+        el.appendChild(icon);
+      }
+    });
+  }
+
+  function getNextServer(current) {
+    switch (current) {
+      case "homePlayer1": return "homePlayer2";
+      case "homePlayer2": return "awayPlayer1";
+      case "awayPlayer1": return "awayPlayer2";
+      case "awayPlayer2": return "homePlayer1";
+      default: return "homePlayer1";
+    }
+  }
+
+  function swapSides() {
+    const homeP1 = document.getElementById("homePlayer1").textContent;
+    const homeP2 = document.getElementById("homePlayer2").textContent;
+    const awayP1 = document.getElementById("awayPlayer1").textContent;
+    const awayP2 = document.getElementById("awayPlayer2").textContent;
+
+    document.getElementById("homePlayer1").textContent = awayP1;
+    document.getElementById("homePlayer2").textContent = awayP2;
+    document.getElementById("awayPlayer1").textContent = homeP1;
+    document.getElementById("awayPlayer2").textContent = homeP2;
+
+    return { home: `${awayP1}-${awayP2}`, away: `${homeP1}-${homeP2}` };
+  }
 
   // -------- FIND BUTTON ----------
   document.getElementById("findBtn")?.addEventListener("click", async () => {
@@ -257,6 +322,9 @@
         document.getElementById("homePlayer2").textContent = homePlayers[1] || "Home --";
         document.getElementById("awayPlayer1").textContent = awayPlayers[0] || "Away --";
         document.getElementById("awayPlayer2").textContent = awayPlayers[1] || "Away --";
+
+        document.getElementById("firstServer").value = data.firstServer || "";
+        highlightCurrentServer(data.currentServer || data.firstServer || "");
       } else {
         console.warn("⚠️ Match not found at:", path);
         alert("Match not found!");
@@ -279,7 +347,21 @@
       const homeScore = parseInt(document.getElementById("homeScore").value, 10) || 0;
       const awayScore = parseInt(document.getElementById("awayScore").value, 10) || 0;
       const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-      await update(ref(db, path), { homeScore, awayScore, state: "ONGOING" });
+
+      let currentServer = document.getElementById("firstServer").value;
+      const snap = await get(ref(db, path));
+      if (snap.exists()) {
+        const data = snap.val();
+        currentServer = getNextServer(data.currentServer || data.firstServer || currentServer);
+      }
+
+      highlightCurrentServer(currentServer);
+
+      await update(ref(db, path), {
+        homeScore, awayScore, state: "ONGOING",
+        firstServer: document.getElementById("firstServer").value,
+        currentServer
+      });
     } catch (err) {
       console.error("❌ Update error:", err);
       alert("Update failed: " + err.message);
@@ -296,13 +378,36 @@
 
     try {
       const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-      await update(ref(db, path), { state: "FINISHED" });
-      alert("🏁 Match marked as Done!");
+      const swapped = swapSides();
+
+      const firstServer = document.getElementById("firstServer").value;
+      const currentServer = document.querySelector(".first-server")?.id || "";
+
+      // reset scores for new set
+      document.getElementById("homeScore").value = 0;
+      document.getElementById("awayScore").value = 0;
+
+      await update(ref(db, path), {
+        state: "FINISHED",
+        firstServer,
+        currentServer,
+        home: swapped.home,
+        away: swapped.away,
+        homeScore: 0,
+        awayScore: 0
+      });
+
+      alert("🏁 Match marked as Done & sides swapped!");
     } catch (err) {
       console.error("❌ Done error:", err);
       alert("Failed to mark done: " + err.message);
     }
   });
-</script>
+
+  // -------- Dropdown change ----------
+  document.getElementById("firstServer")?.addEventListener("change", (e) => {
+    highlightCurrentServer(e.target.value);
+  });
+  </script>
 </body>
 </html>
