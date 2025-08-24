@@ -4,162 +4,56 @@
   <meta charset="UTF-8">
   <title>Referee Panel</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      padding: 20px;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
     h2 { text-align: center; color: #333; }
-    .card {
-      max-width: 500px;
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .input-row {
-      display: flex;
-      margin-bottom: 12px;
-    }
-    .input-row input, .input-row select {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .input-row button {
-      margin-left: 8px;
-      padding: 8px 12px;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    /* Court layout */
-    .court {
-      position: relative;
-      width: 100%;
-      height: 250px;
-      margin: 20px 0;
-      background: #c8e6c9;
-      border: 3px solid #2e7d32;
-      border-radius: 10px;
-    }
-    .court-line {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: #2e7d32;
-    }
-    .court-vertical {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 2px;
-      height: 100%;
-      background: #2e7d32;
-    }
-    .player {
-      position: absolute;
-      width: 100px;
-      padding: 6px;
-      text-align: center;
-      background: rgba(255,255,255,0.9);
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    /* Home team positions */
+    .card { max-width: 700px; margin: 20px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .input-row { display: flex; margin-bottom: 12px; gap: 8px; }
+    .input-row input, .input-row select { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+    .input-row button { padding: 8px 12px; border: none; background: #007bff; color: white; border-radius: 8px; cursor: pointer; }
+    .court { position: relative; width: 100%; height: 240px; margin: 20px 0; background: #c8e6c9; border: 3px solid #2e7d32; border-radius: 10px; }
+    .court-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #2e7d32; transform: translateY(-1px); }
+    .court-vertical { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2e7d32; }
+    .player { position: absolute; width: 120px; padding: 8px; text-align: center; background: rgba(255,255,255,0.95); border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; user-select: none; }
     .home.top-left { top: 20px; left: 20px; }
     .home.bottom-left { bottom: 20px; left: 20px; }
-    /* Away team positions */
     .away.top-right { top: 20px; right: 20px; }
     .away.bottom-right { bottom: 20px; right: 20px; }
-
-    /* Highlight server */
-    .first-server {
-      border: 3px solid #ff9800;
-      box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
-    }
-    .player .serve-icon {
-      margin-left: 6px;
-      font-size: 16px;
-      color: #ff9800;
-    }
-
-    /* Score controls */
-    .score-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
-    }
+    .first-server { border: 3px solid #ff9800; box-shadow: 0 0 10px rgba(255,152,0,0.7); }
+    .score-box { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; padding: 10px; border-radius: 8px; }
     .home { background: #e3f2fd; }
     .away { background: #fce4ec; }
-    .score-controls {
-      display: flex;
-      align-items: center;
-    }
-    .score-controls button {
-      width: 32px; height: 32px;
-      font-size: 18px;
-      border: none;
-      border-radius: 50%;
-      margin: 0 5px;
-      cursor: pointer;
-      background: #ddd;
-    }
-    .score-controls input {
-      width: 50px;
-      text-align: center;
-      font-size: 16px;
-      padding: 5px;
-    }
-    .actions {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .actions button {
-      flex: 1;
-      margin: 0 5px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+    .score-controls { display: flex; align-items: center; }
+    .score-controls button { width: 32px; height: 32px; font-size: 18px; border: none; border-radius: 50%; margin: 0 5px; cursor: pointer; background: #ddd; }
+    .score-controls input { width: 56px; text-align: center; font-size: 16px; padding: 5px; border-radius: 6px; border: 1px solid #ccc; }
+    .actions { margin-top: 20px; display: flex; gap: 8px; }
+    .actions button { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
     #updateBtn { background: #28a745; color: white; }
     #doneBtn { background: #dc3545; color: white; }
+    /* small flash animation when server changes */
+    @keyframes flash {
+      0% { box-shadow: 0 0 0px rgba(255,152,0,0.0); }
+      50% { box-shadow: 0 0 18px rgba(255,152,0,0.9); }
+      100% { box-shadow: 0 0 0px rgba(255,152,0,0.0); }
+    }
+    .flash { animation: flash 700ms ease; }
   </style>
 </head>
 <body>
   <h2>🏓 Referee Panel</h2>
 
   <div class="card">
-    <!-- Tournament ID -->
     <div class="input-row">
       <input type="text" id="tourInput" placeholder="Enter Tournament ID">
     </div>
 
-    <!-- Match ID -->
     <div class="input-row">
       <input type="text" id="matchInput" placeholder="Enter Match ID">
       <button id="findBtn">Find</button>
     </div>
 
-    <!-- Match Info -->
     <div id="matchArea">
       <p><strong>Match:</strong> <span id="matchId">---</span></p>
 
-      <!-- Court -->
       <div class="court">
         <div class="court-line"></div>
         <div class="court-vertical"></div>
@@ -169,7 +63,6 @@
         <div class="player away bottom-right" id="awayPlayer2">Away --</div>
       </div>
 
-      <!-- First Server -->
       <div class="input-row">
         <select id="firstServer">
           <option value="">-- Select First Server --</option>
@@ -184,7 +77,7 @@
         <strong>Home:</strong> <span id="homeName">--</span>
         <div class="score-controls">
           <button onclick="changeScore('home', -1)">-</button>
-          <input type="number" id="homeScore" min="0" max="11" value="0">
+          <input type="number" id="homeScore" min="0" max="99" value="0">
           <button onclick="changeScore('home', 1)">+</button>
         </div>
       </div>
@@ -193,7 +86,7 @@
         <strong>Away:</strong> <span id="awayName">--</span>
         <div class="score-controls">
           <button onclick="changeScore('away', -1)">-</button>
-          <input type="number" id="awayScore" min="0" max="11" value="0">
+          <input type="number" id="awayScore" min="0" max="99" value="0">
           <button onclick="changeScore('away', 1)">+</button>
         </div>
       </div>
@@ -211,8 +104,8 @@
 
   console.log("✅ JS Loaded");
 
-  // ⚠️ replace with your real Firebase config
-    const firebaseConfig = {
+  // --- Firebase config: REPLACE with your real config ---
+   const firebaseConfig = {
     apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
     authDomain: "fir-demo-a1c99.firebaseapp.com",
     databaseURL: "https://fir-demo-a1c99.firebaseio.com",
@@ -230,184 +123,331 @@
     console.log("✅ Firebase initialized");
   } catch (e) {
     console.error("❌ Firebase init error:", e);
-    alert("Firebase config error! Check console.");
+    // keep going — operations will be guarded by checks on db
   }
 
   let currentMatchId = null;
   let currentTourId = null;
 
-  // -------- Helpers ----------
-  window.changeScore = function (team, delta) {
+  // DOM refs
+  const firstServerSelect = document.getElementById("firstServer");
+  const homeP1 = document.getElementById("homePlayer1");
+  const homeP2 = document.getElementById("homePlayer2");
+  const awayP1 = document.getElementById("awayPlayer1");
+  const awayP2 = document.getElementById("awayPlayer2");
+
+  // helper: read player name (strip serve icon if present)
+  function getPlayerName(id) {
+    const el = document.getElementById(id);
+    if (!el) return "";
+    return el.textContent.replace("🎾", "").trim();
+  }
+
+  // update options labels from DOM (keeps option values as ids)
+  function refreshFirstServerOptions() {
+    const map = {
+      homePlayer1: getPlayerName("homePlayer1") || "Home --",
+      homePlayer2: getPlayerName("homePlayer2") || "Home --",
+      awayPlayer1: getPlayerName("awayPlayer1") || "Away --",
+      awayPlayer2: getPlayerName("awayPlayer2") || "Away --"
+    };
+    // preserve selected id
+    const sel = firstServerSelect.value;
+    firstServerSelect.innerHTML = `
+      <option value="">-- Select First Server --</option>
+      <option value="homePlayer1">${map.homePlayer1}</option>
+      <option value="homePlayer2">${map.homePlayer2}</option>
+      <option value="awayPlayer1">${map.awayPlayer1}</option>
+      <option value="awayPlayer2">${map.awayPlayer2}</option>
+    `;
+    if (sel) firstServerSelect.value = sel;
+  }
+
+  // highlight server (no duplicates); also add small flash
+  function highlightCurrentServer(playerId) {
+    const ids = ["homePlayer1","homePlayer2","awayPlayer1","awayPlayer2"];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("first-server", "flash");
+      // remove icon if present
+      el.textContent = getPlayerName(id);
+    });
+    if (!playerId) return;
+    const el = document.getElementById(playerId);
+    if (!el) return;
+    // add icon and class
+    el.classList.add("first-server", "flash");
+    el.textContent = "🎾 " + getPlayerName(playerId);
+    // remove flash class after animation so it can replay next time
+    setTimeout(()=> el.classList.remove("flash"), 800);
+  }
+
+  // toggle id within same team
+  function toggleWithinTeam(serverId) {
+    if (serverId === "homePlayer1") return "homePlayer2";
+    if (serverId === "homePlayer2") return "homePlayer1";
+    if (serverId === "awayPlayer1") return "awayPlayer2";
+    if (serverId === "awayPlayer2") return "awayPlayer1";
+    return serverId || "";
+  }
+
+  // compute server after a point (rules described earlier)
+  function nextServerAfterPoint(scoringTeam, prevServerId) {
+    const fs = firstServerSelect.value || "";
+    const fsIsHome = fs === "homePlayer1" || fs === "homePlayer2";
+    const fsIsAway = fs === "awayPlayer1" || fs === "awayPlayer2";
+
+    if (scoringTeam === "home") {
+      if (prevServerId && prevServerId.startsWith("home")) {
+        // same team served before point -> toggle within team due to swap
+        return toggleWithinTeam(prevServerId);
+      } else {
+        // transfer serve to home team
+        return fsIsHome ? fs : "homePlayer1";
+      }
+    } else if (scoringTeam === "away") {
+      if (prevServerId && prevServerId.startsWith("away")) {
+        return toggleWithinTeam(prevServerId);
+      } else {
+        return fsIsAway ? fs : "awayPlayer1";
+      }
+    }
+    return prevServerId || fs || "homePlayer1";
+  }
+
+  // change score controls
+  window.changeScore = function(team, delta) {
     const input = document.getElementById(team + "Score");
     let val = parseInt(input.value || "0", 10);
     val = Math.max(0, val + delta);
     input.value = val;
   };
 
-  function highlightCurrentServer(playerId) {
-    const allPlayers = ["homePlayer1","homePlayer2","awayPlayer1","awayPlayer2"];
-    allPlayers.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove("first-server");
-      const oldIcon = el.querySelector(".serve-icon");
-      if (oldIcon) oldIcon.remove();
-      if (id === playerId) {
-        el.classList.add("first-server");
-        const icon = document.createElement("span");
-        icon.className = "serve-icon";
-        icon.textContent = "🎾";
-        el.appendChild(icon);
-      }
-    });
-  }
-
-  function getNextServer(current) {
-    switch (current) {
-      case "homePlayer1": return "homePlayer2";
-      case "homePlayer2": return "awayPlayer1";
-      case "awayPlayer1": return "awayPlayer2";
-      case "awayPlayer2": return "homePlayer1";
-      default: return "homePlayer1";
-    }
-  }
-
+  // swap sides (used by Done) — swaps displayed DOM names
   function swapSides() {
-    const homeP1 = document.getElementById("homePlayer1").textContent;
-    const homeP2 = document.getElementById("homePlayer2").textContent;
-    const awayP1 = document.getElementById("awayPlayer1").textContent;
-    const awayP2 = document.getElementById("awayPlayer2").textContent;
+    const h1 = getPlayerName("homePlayer1");
+    const h2 = getPlayerName("homePlayer2");
+    const a1 = getPlayerName("awayPlayer1");
+    const a2 = getPlayerName("awayPlayer2");
 
-    document.getElementById("homePlayer1").textContent = awayP1;
-    document.getElementById("homePlayer2").textContent = awayP2;
-    document.getElementById("awayPlayer1").textContent = homeP1;
-    document.getElementById("awayPlayer2").textContent = homeP2;
+    document.getElementById("homePlayer1").textContent = a1;
+    document.getElementById("homePlayer2").textContent = a2;
+    document.getElementById("awayPlayer1").textContent = h1;
+    document.getElementById("awayPlayer2").textContent = h2;
 
-    return { home: `${awayP1}-${awayP2}`, away: `${homeP1}-${homeP2}` };
+    // refresh dropdown labels
+    refreshFirstServerOptions();
+
+    return { home: `${a1}-${a2}`, away: `${h1}-${h2}` };
   }
 
   // -------- FIND BUTTON ----------
   document.getElementById("findBtn")?.addEventListener("click", async () => {
-    console.log("🔍 Find button clicked");
+    console.log("🔍 Find clicked");
     try {
       const matchId = document.getElementById("matchInput").value.trim();
       const tourId = document.getElementById("tourInput").value.trim();
-
       if (!tourId) return alert("Enter a Tournament ID!");
       if (!matchId) return alert("Enter a Match ID!");
 
+      if (!db) return alert("Firebase not initialized (fill firebaseConfig).");
+
       const path = `tournaments/${tourId}/matches/${matchId}`;
-      console.log("📂 Fetching path:", path);
-
-      const matchRef = ref(db, path);
-      const snapshot = await get(matchRef);
-
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        console.log("✅ Data found:", data);
-
-        currentMatchId = matchId;
-        currentTourId = tourId;
-
-        document.getElementById("matchId").textContent = matchId;
-        document.getElementById("homeName").textContent = data.home || "--";
-        document.getElementById("awayName").textContent = data.away || "--";
-        document.getElementById("homeScore").value = data.homeScore ?? 0;
-        document.getElementById("awayScore").value = data.awayScore ?? 0;
-
-        const homePlayers = (data.home || "Home1-Home2").split("-");
-        const awayPlayers = (data.away || "Away1-Away2").split("-");
-
-        document.getElementById("homePlayer1").textContent = homePlayers[0] || "Home --";
-        document.getElementById("homePlayer2").textContent = homePlayers[1] || "Home --";
-        document.getElementById("awayPlayer1").textContent = awayPlayers[0] || "Away --";
-        document.getElementById("awayPlayer2").textContent = awayPlayers[1] || "Away --";
-
-        document.getElementById("firstServer").value = data.firstServer || "";
-        highlightCurrentServer(data.currentServer || data.firstServer || "");
-      } else {
-        console.warn("⚠️ Match not found at:", path);
+      const snap = await get(ref(db, path));
+      if (!snap.exists()) {
         alert("Match not found!");
+        return;
       }
+      const data = snap.val();
+
+      currentMatchId = matchId;
+      currentTourId = tourId;
+
+      document.getElementById("matchId").textContent = matchId;
+      document.getElementById("homeName").textContent = data.home || "--";
+      document.getElementById("awayName").textContent = data.away || "--";
+      document.getElementById("homeScore").value = data.homeScore ?? 0;
+      document.getElementById("awayScore").value = data.awayScore ?? 0;
+
+      const homePlayers = (data.home || "Home1-Home2").split("-");
+      const awayPlayers = (data.away || "Away1-Away2").split("-");
+
+      document.getElementById("homePlayer1").textContent = homePlayers[0] || "Home --";
+      document.getElementById("homePlayer2").textContent = homePlayers[1] || "Home --";
+      document.getElementById("awayPlayer1").textContent = awayPlayers[0] || "Away --";
+      document.getElementById("awayPlayer2").textContent = awayPlayers[1] || "Away --";
+
+      // refresh dropdown labels and select stored firstServer
+      refreshFirstServerOptions();
+      if (data.firstServer) firstServerSelect.value = data.firstServer;
+
+      // highlight current server (if any)
+      highlightCurrentServer(data.currentServer || data.firstServer || "");
+      console.log("✅ Match loaded");
     } catch (err) {
       console.error("❌ Find error:", err);
-      alert("Error: " + err.message);
+      alert("Error: " + (err.message || err));
     }
   });
 
   // -------- UPDATE SCORE BUTTON ----------
   document.getElementById("updateBtn")?.addEventListener("click", async () => {
-    console.log("💾 Update button clicked");
+    console.log("💾 Update clicked");
     if (!currentMatchId || !currentTourId) {
-      alert("⚠️ Load a match first using Find!");
+      alert("Load a match first using Find!");
       return;
     }
+    if (!db) { alert("Firebase not initialized."); return; }
 
     try {
-      const homeScore = parseInt(document.getElementById("homeScore").value, 10) || 0;
-      const awayScore = parseInt(document.getElementById("awayScore").value, 10) || 0;
+      const newHomeScore = parseInt(document.getElementById("homeScore").value, 10) || 0;
+      const newAwayScore = parseInt(document.getElementById("awayScore").value, 10) || 0;
       const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-
-      let currentServer = document.getElementById("firstServer").value;
       const snap = await get(ref(db, path));
+      const payload = {
+        homeScore: newHomeScore,
+        awayScore: newAwayScore,
+        state: "ONGOING",
+        firstServer: firstServerSelect.value || ""
+      };
+
+      let currentServerId = firstServerSelect.value || "";
+
       if (snap.exists()) {
         const data = snap.val();
-        currentServer = getNextServer(data.currentServer || data.firstServer || currentServer);
+        const oldHome = data.homeScore || 0;
+        const oldAway = data.awayScore || 0;
+        let scoringTeam = null;
+        if (newHomeScore > oldHome) scoringTeam = "home";
+        else if (newAwayScore > oldAway) scoringTeam = "away";
+
+        // BEFORE changing server, swap players (DOM) for the scoring team
+        if (scoringTeam === "home") {
+          const name1 = getPlayerName("homePlayer1");
+          const name2 = getPlayerName("homePlayer2");
+          document.getElementById("homePlayer1").textContent = name2;
+          document.getElementById("homePlayer2").textContent = name1;
+        } else if (scoringTeam === "away") {
+          const name1 = getPlayerName("awayPlayer1");
+          const name2 = getPlayerName("awayPlayer2");
+          document.getElementById("awayPlayer1").textContent = name2;
+          document.getElementById("awayPlayer2").textContent = name1;
+        }
+
+        // update option labels after swap
+        refreshFirstServerOptions();
+
+        const prevServerId = data.currentServer || data.firstServer || (firstServerSelect.value || "");
+        if (scoringTeam) {
+          currentServerId = nextServerAfterPoint(scoringTeam, prevServerId);
+        } else {
+          currentServerId = prevServerId;
+        }
+
+        // persist updated home/away order so DB matches DOM
+        payload.currentServer = currentServerId;
+        payload.home = `${getPlayerName("homePlayer1")}-${getPlayerName("homePlayer2")}`;
+        payload.away = `${getPlayerName("awayPlayer1")}-${getPlayerName("awayPlayer2")}`;
+      } else {
+        // no snap: just set currentServer from select
+        payload.currentServer = firstServerSelect.value || "";
       }
 
-      highlightCurrentServer(currentServer);
+      // highlight and notify if server changed
+      const dbBefore = (snap.exists() ? (snap.val().currentServer || snap.val().firstServer || "") : "");
+      if (payload.currentServer && payload.currentServer !== dbBefore) {
+        console.log(`🎾 Server changed from "${dbBefore}" to "${payload.currentServer}"`);
+      }
 
-      await update(ref(db, path), {
-        homeScore, awayScore, state: "ONGOING",
-        firstServer: document.getElementById("firstServer").value,
-        currentServer
-      });
+      highlightCurrentServer(payload.currentServer);
+      await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), payload);
+
+      console.log("✅ Update saved:", payload);
     } catch (err) {
       console.error("❌ Update error:", err);
-      alert("Update failed: " + err.message);
+      alert("Update failed: " + (err.message || err));
     }
   });
 
   // -------- SET DONE BUTTON ----------
   document.getElementById("doneBtn")?.addEventListener("click", async () => {
-    console.log("🏁 Done button clicked");
+    console.log("🏁 Done clicked");
     if (!currentMatchId || !currentTourId) {
-      alert("⚠️ Load a match first using Find!");
+      alert("Load a match first using Find!");
       return;
     }
+    if (!db) { alert("Firebase not initialized."); return; }
 
     try {
       const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+      // swap sides in DOM & refresh dropdown
       const swapped = swapSides();
 
-      const firstServer = document.getElementById("firstServer").value;
-      const currentServer = document.querySelector(".first-server")?.id || "";
-
-      // reset scores for new set
-      document.getElementById("homeScore").value = 0;
-      document.getElementById("awayScore").value = 0;
+      // after done we reset scores to 0 in DB and remove currentServer (start new set)
+      highlightCurrentServer(""); // remove highlight
+      refreshFirstServerOptions();
+      firstServerSelect.value = "";
 
       await update(ref(db, path), {
         state: "FINISHED",
-        firstServer,
-        currentServer,
+        firstServer: "",
+        currentServer: "",
         home: swapped.home,
         away: swapped.away,
         homeScore: 0,
         awayScore: 0
       });
 
-      alert("🏁 Match marked as Done & sides swapped!");
+      // update UI
+      document.getElementById("homeScore").value = 0;
+      document.getElementById("awayScore").value = 0;
+      alert("🏁 Match marked Done.");
     } catch (err) {
       console.error("❌ Done error:", err);
-      alert("Failed to mark done: " + err.message);
+      alert("Failed to mark done: " + (err.message || err));
     }
   });
 
   // -------- Dropdown change ----------
-  document.getElementById("firstServer")?.addEventListener("change", (e) => {
-    highlightCurrentServer(e.target.value);
+  firstServerSelect?.addEventListener("change", async (e) => {
+    const id = e.target.value;
+    highlightCurrentServer(id);
+    // optionally persist selection to DB (so firstServer is saved)
+    if (db && currentTourId && currentMatchId) {
+      try {
+        await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), { firstServer: id });
+      } catch (err) {
+        console.warn("Couldn't save firstServer:", err);
+      }
+    }
   });
+
+  // -------- Tap on player to set server ----------
+  ["homePlayer1","homePlayer2","awayPlayer1","awayPlayer2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("click", async () => {
+      // set dropdown value / highlight
+      firstServerSelect.value = id;
+      highlightCurrentServer(id);
+
+      // persist to DB (firstServer and currentServer)
+      if (db && currentTourId && currentMatchId) {
+        try {
+          await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), {
+            firstServer: id,
+            currentServer: id
+          });
+        } catch (err) {
+          console.warn("Couldn't save server on click:", err);
+        }
+      }
+    });
+  });
+
+  // initial refresh options (so labels consistent if DOM changed before script)
+  refreshFirstServerOptions();
   </script>
 </body>
 </html>
