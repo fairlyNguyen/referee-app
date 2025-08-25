@@ -33,7 +33,7 @@
 
   .actions { margin-top: 20px; display: flex; gap: 8px; }
   .actions button { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-  #updateBtn { background: #28a745; color: white; }
+  #changeSidesBtn { background: #28a745; color: white; }
   #doneBtn { background: #dc3545; color: white; }
 
   @keyframes flash { 0% { box-shadow: 0 0 0 rgba(255,152,0,0.0); } 
@@ -67,28 +67,28 @@
       </div>
 
       <!-- Score area in 2 columns -->
-      <div class="score-container">
-        <div class="score-box home">
-          <span class="score-header">Home: <span id="homeName">--</span></span>
-          <div class="score-controls">
-            <button data-team="home" data-delta="-1">-</button>
-            <input type="number" id="homeScore" min="0" max="99" value="0">
-            <button data-team="home" data-delta="1">+</button>
-          </div>
-        </div>
+<div class="score-container">
+  <div class="score-box home">
+    <span class="score-header">Home: <span id="homeName">--</span></span>
+    <div class="score-controls">
+      <button data-team="home" data-delta="-1">-</button>
+      <input type="number" id="homeScore" min="0" max="99" value="0">
+      <button data-team="home" data-delta="1">+</button>
+    </div>
+  </div>
 
-        <div class="score-box away">
-          <span class="score-header">Away: <span id="awayName">--</span></span>
-          <div class="score-controls">
-            <button data-team="away" data-delta="-1">-</button>
-            <input type="number" id="awayScore" min="0" max="99" value="0">
-            <button data-team="away" data-delta="1">+</button>
-          </div>
-        </div>
-      </div>
+  <div class="score-box away">
+    <span class="score-header">Away: <span id="awayName">--</span></span>
+    <div class="score-controls">
+      <button data-team="away" data-delta="-1">-</button>
+      <input type="number" id="awayScore" min="0" max="99" value="0">
+      <button data-team="away" data-delta="1">+</button>
+    </div>
+  </div>
+</div>
 
       <div class="actions">
-        <button id="updateBtn">✅ Update Score</button>
+		<button id="changeSidesBtn">🔄 Change Sides</button>
         <button id="doneBtn">🏁 Set Done</button>
       </div>
     </div>
@@ -99,14 +99,14 @@
     import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
     const firebaseConfig = { 
-    apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
-    authDomain: "fir-demo-a1c99.firebaseapp.com",
-    databaseURL: "https://fir-demo-a1c99.firebaseio.com",
-    projectId: "fir-demo-a1c99",
-    storageBucket: "fir-demo-a1c99.firebasestorage.app",
-    messagingSenderId: "980490887183",
-    appId: "1:980490887183:web:ef665624ab306006d7037a",
-    measurementId: "G-TR0CCTRTGJ"
+		apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
+		authDomain: "fir-demo-a1c99.firebaseapp.com",
+		databaseURL: "https://fir-demo-a1c99.firebaseio.com",
+		projectId: "fir-demo-a1c99",
+		storageBucket: "fir-demo-a1c99.firebasestorage.app",
+		messagingSenderId: "980490887183",
+		appId: "1:980490887183:web:ef665624ab306006d7037a",
+		measurementId: "G-TR0CCTRTGJ"
 	};
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -154,33 +154,44 @@
     });
 
     async function loadMatch() {
-      const matchId = $("matchInput").value.trim();
-      const tourId = $("tourInput").value.trim();
-      if (!matchId || !tourId) return alert("Enter IDs");
+  const matchId = $("matchInput").value.trim();
+  const tourId = $("tourInput").value.trim();
+  if (!matchId || !tourId) return alert("Enter Tournament and Match IDs");
 
-      const path = `tournaments/${tourId}/matches/${matchId}`;
-      const snap = await get(ref(db, path));
-      if (!snap.exists()) return alert("Match not found");
+  const path = `tournaments/${tourId}/matches/${matchId}`;
+  const snap = await get(ref(db, path));
+  if (!snap.exists()) return alert("Match not found");
 
-      const data = snap.val();
-      currentMatchId = matchId;
-      currentTourId = tourId;
+  const data = snap.val();
+  currentMatchId = matchId;
+  currentTourId = tourId;
 
-      $("matchId").textContent = matchId;
-      $("homeName").textContent = data.home || "--";
-      $("awayName").textContent = data.away || "--";
-      $("homeScore").value = data.homeScore ?? 0;
-      $("awayScore").value = data.awayScore ?? 0;
+  // --- Parse players from data ---
+  // Expecting format "Player1-Player2"
+  homePlayers = (data.home || "Home1-Home2").split("-").map(p => p.trim());
+  awayPlayers = (data.away || "Away1-Away2").split("-").map(p => p.trim());
 
-      const [h1,h2] = (data.home||"Home1-Home2").split("-");
-      const [a1,a2] = (data.away||"Away1-Away2").split("-");
-      $("homePlayer1").textContent = h1;
-      $("homePlayer2").textContent = h2;
-      $("awayPlayer1").textContent = a1;
-      $("awayPlayer2").textContent = a2;
+  // --- Update player elements on court ---
+  $("homePlayer1").textContent = homePlayers[0];
+  $("homePlayer2").textContent = homePlayers[1];
+  $("awayPlayer1").textContent = awayPlayers[0];
+  $("awayPlayer2").textContent = awayPlayers[1];
 
-      highlightServer(data.currentServer || "");
-    }
+  // --- Update score fields ---
+  $("homeScore").value = data.homeScore ?? 0;
+  $("awayScore").value = data.awayScore ?? 0;
+
+  // --- Update names display ---
+  $("homeName").textContent = homePlayers.join(" - ");
+  $("awayName").textContent = awayPlayers.join(" - ");
+
+  // --- Highlight current server ---
+  currentServer = data.currentServer || null;
+  highlightServer(currentServer);
+
+  console.log("✅ Match loaded successfully!", { homePlayers, awayPlayers, currentServer });
+}
+
 
   async function updateMatch() {
   if (!currentMatchId || !currentTourId) return alert("Load a match first!");
@@ -211,22 +222,97 @@
   await update(ref(db, path), {
     homeScore: newHomeScore,
     awayScore: newAwayScore,
-    state: "ONGOING"
+    state: "ONGOING",
+	isChangeSides: false
   });
 
   console.log("✅ Match updated:", { newHomeScore, newAwayScore, currentServer });
 }
 
+// Keep track of players globally
+let homePlayers = [];
+let awayPlayers = [];
+
+async function changeSides() {
+  if (!currentMatchId || !currentTourId) {
+    return alert("Please load a match first before changing sides.");
+  }
+
+  console.log("🔄 Changing sides...");
+
+  // 1. Swap players in memory
+  [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
+
+  // 2. Swap scores from UI
+  const homeScoreEl = $("homeScore");
+  const awayScoreEl = $("awayScore");
+  const newHomeScore = parseInt(awayScoreEl.value) || 0;
+  const newAwayScore = parseInt(homeScoreEl.value) || 0;
+
+  // 3. Swap server
+  let newServerId = null;
+  if (currentServer) {
+    if (currentServer.startsWith("home")) {
+      const index = currentServer === "homePlayer1" ? 0 : 1;
+      newServerId = "awayPlayer" + (index + 1);
+    } else {
+      const index = currentServer === "awayPlayer1" ? 0 : 1;
+      newServerId = "homePlayer" + (index + 1);
+    }
+  }
+
+  // 4. Prepare data for Firebase
+  const updateData = {
+    home: homePlayers.join("-"),
+    away: awayPlayers.join("-"),
+    homeScore: newHomeScore,
+    awayScore: newAwayScore,
+    currentServer: newServerId,
+	isChangeSides: true
+  };
+
+  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+  await update(ref(db, path), updateData);
+
+  // 5. Update UI
+  $("homePlayer1").textContent = homePlayers[0];
+  $("homePlayer2").textContent = homePlayers[1];
+  $("awayPlayer1").textContent = awayPlayers[0];
+  $("awayPlayer2").textContent = awayPlayers[1];
+
+  $("homeName").textContent = homePlayers.join(" - ");
+  $("awayName").textContent = awayPlayers.join(" - ");
+
+  $("homeScore").value = newHomeScore;
+  $("awayScore").value = newAwayScore;
+
+  // 6. Update server state
+  currentServer = newServerId;
+  highlightServer(currentServer);
+
+  console.log("✅ Sides changed and data successfully saved to Firebase!");
+}
+
+
+const buttons = document.querySelectorAll('button[data-delta]');
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    updateMatch();
+  });
+});
+
 
     async function setDone() {
       if (!currentMatchId || !currentTourId) return;
-      await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), { state: "FINISHED" });
+      await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), { 
+	  isChangeSides: false,
+	  state: "FINISHED" });
       highlightServer("");
       alert("🏁 Match Done");
     }
 
     $("findBtn").addEventListener("click", loadMatch);
-    $("updateBtn").addEventListener("click", updateMatch);
+    $("changeSidesBtn").addEventListener("click", changeSides);
     $("doneBtn").addEventListener("click", setDone);
 
     playerIds.forEach(id => {
