@@ -345,6 +345,11 @@
   const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
   const snap = await get(ref(db, path));
   const data = snap.exists() ? snap.val() : {};
+  
+  const matchState = data.state
+  if(matchState == "FINISHED") {
+	  return alert("Match already finished. Cannot update.");
+  }
 
   const newHomeScore = parseInt($("homeScore").value) || 0;
   const newAwayScore = parseInt($("awayScore").value) || 0;
@@ -380,9 +385,19 @@ let homePlayers = [];
 let awayPlayers = [];
 
 async function changeSides() {
-  if (!currentMatchId || !currentTourId) {
+   if (!currentMatchId || !currentTourId) {
     return alert("Please load a match first before changing sides.");
   }
+  
+  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+  const snap = await get(ref(db, path));
+  const data = snap.exists() ? snap.val() : {};
+  
+  const matchState = data.state
+  if(matchState == "FINISHED") {
+	  return alert("Match already finished. Cannot update.");
+  }
+  
 
   console.log("🔄 Changing sides...");
 
@@ -417,7 +432,6 @@ async function changeSides() {
 	isChangeSides: true
   };
 
-  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
   await update(ref(db, path), updateData);
 
   // 5. Update UI
@@ -439,7 +453,16 @@ async function changeSides() {
   console.log("✅ Sides changed and data successfully saved to Firebase!");
 }
 
-function swapTeamPositions(team) {
+async function swapTeamPositions(team) {
+  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+  const snap = await get(ref(db, path));
+  const data = snap.exists() ? snap.val() : {};
+  
+  const matchState = data.state
+  if(matchState == "FINISHED") {
+	  return alert("Match already finished. Cannot update.");
+  }
+  
   if (team === "home") {
     const p1 = $("homePlayer1");
     const p2 = $("homePlayer2");
@@ -463,12 +486,23 @@ buttons.forEach(button => {
 });
 
 
-    async function setDone() {
+async function setDone() {
       if (!currentMatchId || !currentTourId) return;
-      await update(ref(db, `tournaments/${currentTourId}/matches/${currentMatchId}`), { 
+	  
+	 const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+	const snap = await get(ref(db, path));
+	const data = snap.exists() ? snap.val() : {};
+  
+	const matchState = data.state
+	if(matchState == "FINISHED") {
+	  return alert("Match already finished. Cannot update.");
+	}
+  
+      await update(ref(db, path), { 
 	  isChangeSides: false,
 	  state: "FINISHED" });
       highlightServer("");
+	  
       alert("🏁 Match Done");
     }
 
