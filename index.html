@@ -221,7 +221,7 @@ h2 {
     <input type="text" id="tourInput" placeholder="Enter Tournament ID" value="019f62b7-5eb6-4092-9279-df9ddb48449d">
   </div>
   <div class="input-row">
-    <input type="text" id="matchInput" placeholder="Enter Match ID">
+    <input type="text" id="matchInput" placeholder="Enter Match ID" value = "b2f919e1-2177-49a0-94da-e078e6102364">
     <button id="findBtn">Find</button>
   </div>
 
@@ -416,56 +416,58 @@ let homePlayers = [];
 let awayPlayers = [];
 
 async function changeSides() {
-   if (!currentMatchId || !currentTourId) {
+  if (!currentMatchId || !currentTourId) {
     return alert("Please load a match first before changing sides.");
   }
-  
+
   const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
   const snap = await get(ref(db, path));
   const data = snap.exists() ? snap.val() : {};
-  
-  const matchState = data.state
-  if(matchState == "FINISHED") {
-	  return alert("Match already finished. Cannot update.");
+
+  const matchState = data.state;
+  if (matchState === "FINISHED") {
+    return alert("Match already finished. Cannot update.");
   }
-  
 
   console.log("🔄 Changing sides...");
 
-  // 1. Swap players in memory
+  //Swap players in memory
   [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
 
-  // 2. Swap scores from UI
+  // Swap scores from UI
   const homeScoreEl = $("homeScore");
   const awayScoreEl = $("awayScore");
   const newHomeScore = parseInt(awayScoreEl.value) || 0;
   const newAwayScore = parseInt(homeScoreEl.value) || 0;
 
-  // 3. Swap server
-  let newServerId = null;
-  if (currentServer) {
-    if (currentServer.startsWith("home")) {
-      const index = currentServer === "homePlayer1" ? 0 : 1;
-      newServerId = "awayPlayer" + (index + 1);
-    } else {
-      const index = currentServer === "awayPlayer1" ? 0 : 1;
-      newServerId = "homePlayer" + (index + 1);
-    }
+  // Swap server (map sang player cùng vị trí ở đội kia)
+  function getNewServerId(oldServerId) {
+    if (!oldServerId) return null;
+    const map = {
+      "homePlayer1": "awayPlayer2",
+      "homePlayer2": "awayPlayer1",
+      "awayPlayer1": "homePlayer2",
+      "awayPlayer2": "homePlayer1",
+    };
+    return map[oldServerId] || null;
   }
+  let newServerId = getNewServerId(currentServer);
 
-  // 4. Prepare data for Firebase
+  // Prepare data for Firebase
   const updateData = {
     home: homePlayers.join("-"),
     away: awayPlayers.join("-"),
     homeScore: newHomeScore,
     awayScore: newAwayScore,
     currentServer: newServerId,
-	isChangeSides: true
+    isChangeSides: true
   };
 
   await update(ref(db, path), updateData);
-
-  // 5. Update UI
+  currentServer = newServerId
+  highlightServer(currentServer);
+  
+  // Update UI players
   $("homePlayer1").textContent = homePlayers[0];
   $("homePlayer2").textContent = homePlayers[1];
   $("awayPlayer1").textContent = awayPlayers[0];
@@ -476,10 +478,8 @@ async function changeSides() {
 
   $("homeScore").value = newHomeScore;
   $("awayScore").value = newAwayScore;
-
-  // 6. Update server state
-  currentServer = newServerId;
-  highlightServer(currentServer);
+  swapTeamPositions("home");
+  swapTeamPositions("away");
 
   console.log("✅ Sides changed and data successfully saved to Firebase!");
 }
@@ -554,3 +554,4 @@ async function setDone() {
   </script>
 </body>
 </html>
+
