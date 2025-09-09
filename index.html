@@ -345,8 +345,8 @@ h2 {
 
   // --- Parse players from data ---
   // Expecting format "Player1-Player2"
-  homePlayers = (data.home || "Home1-Home2").split("-").map(p => p.trim());
-  awayPlayers = (data.away || "Away1-Away2").split("-").map(p => p.trim());
+  homePlayers = (data.home || "Home1-Home2").split(/\s*-\s*/).map(p => p.trim());
+  awayPlayers = (data.away || "Away1-Away2").split(/\s*-\s*/).map(p => p.trim());
 
   // --- Update player elements on court ---
   $("homePlayer1").textContent = homePlayers[0];
@@ -554,5 +554,6 @@ async function setDone() {
   </script>
 </body>
 </html>
+
 
 
