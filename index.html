@@ -345,8 +345,8 @@ h2 {
 
   // --- Parse players from data ---
   // Expecting format "Player1-Player2"
-  homePlayers = (data.home || "Home1-Home2").split(/\s*[-–—]\s*/).map(p => p.trim());
-  awayPlayers = (data.away || "Away1-Away2").split(/\s*[-–—]\s*/).map(p => p.trim());
+  homePlayers = (data.home || "Home1-Home2").split(/\s*[-–—+]\s*/).map(p => p.trim());
+  awayPlayers = (data.away || "Away1-Away2").split(/\s*[-–—+]\s*/).map(p => p.trim());
 	console.log("players", {homePlayers, awayPlayers})
 
   // --- Update player elements on court ---
@@ -555,6 +555,7 @@ async function setDone() {
   </script>
 </body>
 </html>
+
 
 
 
