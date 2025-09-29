@@ -5,7 +5,7 @@
   <title>Danh sách trận đấu</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
     // 👉 Thay config Firebase của bạn ở đây
     const firebaseConfig = {
@@ -22,65 +22,151 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    async function loadAllMatches() {
+    function loadAllMatches() {
       const tourId = document.getElementById("tourInput").value.trim();
       if (!tourId) return alert("⚠️ Nhập Tournament ID!");
 
       const path = `tournaments/${tourId}/matches`;
-      const snap = await get(ref(db, path));
-      if (!snap.exists()) return alert("❌ Không tìm thấy trận đấu nào");
+      const matchesRef = ref(db, path);
 
-      const matches = snap.val();
-      const container = document.getElementById("matchesContainer");
-      container.innerHTML = "";
+      onValue(matchesRef, (snapshot) => {
+        const container = document.getElementById("matchesContainer");
+        container.innerHTML = "";
 
-      Object.entries(matches).forEach(([matchId, data]) => {
-        const home = data.home || "Home";
-        const away = data.away || "Away";
-        const homeScore = data.homeScore ?? 0;
-        const awayScore = data.awayScore ?? 0;
+        if (!snapshot.exists()) {
+          container.innerHTML = "<p>❌ Không tìm thấy trận đấu nào</p>";
+          return;
+        }
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h3>${home} vs ${away}</h3>
-          <div class="row">
-            <label>${home}</label>
-            <input type="number" class="homeScore" value="${homeScore}">
-          </div>
-          <div class="row">
-            <label>${away}</label>
-            <input type="number" class="awayScore" value="${awayScore}">
-          </div>
-          <button class="saveBtn">💾 Lưu</button>
-        `;
+        const matches = snapshot.val();
+        console.log("📌 Matches data:", matches);
 
-        const homeInput = card.querySelector(".homeScore");
-        const awayInput = card.querySelector(".awayScore");
+        Object.entries(matches).forEach(([matchId, data]) => {
+          const home = data.home || "Home";
+          const away = data.away || "Away";
+          const homeScore = data.homeScore ?? 0;
+          const awayScore = data.awayScore ?? 0;
 
-        card.querySelector(".saveBtn").onclick = async () => {
-          await update(ref(db, `${path}/${matchId}`), {
-            homeScore: parseInt(homeInput.value) || 0,
-            awayScore: parseInt(awayInput.value) || 0,
-            state: "ONGOING"
-          });
-          alert(`✅ Đã lưu điểm trận ${matchId}`);
-        };
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="match-header">⚡ Trận: ${matchId}</div>
+            <div class="team home">
+              <span>${home}</span>
+              <input type="number" class="homeScore" value="${homeScore}">
+            </div>
+            <div class="team away">
+              <span>${away}</span>
+              <input type="number" class="awayScore" value="${awayScore}">
+            </div>
+            <button class="saveBtn">💾 Lưu điểm</button>
+          `;
 
-        container.appendChild(card);
+          const homeInput = card.querySelector(".homeScore");
+          const awayInput = card.querySelector(".awayScore");
+
+          card.querySelector(".saveBtn").onclick = async () => {
+            await update(ref(db, `${path}/${matchId}`), {
+              homeScore: parseInt(homeInput.value) || 0,
+              awayScore: parseInt(awayInput.value) || 0,
+              state: "ONGOING"
+            });
+            alert(`✅ Đã lưu điểm trận ${matchId}`);
+          };
+
+          container.appendChild(card);
+        });
       });
     }
 
     window.loadAllMatches = loadAllMatches;
   </script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .input-row { margin-bottom: 20px; }
-    #matchesContainer { display: flex; flex-direction: column; gap: 16px; }
-    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; background: #fafafa; }
-    .row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
-    .row input { width: 60px; text-align: center; }
-    button { margin-top: 10px; padding: 6px 12px; cursor: pointer; }
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      padding: 20px; 
+      background: #f2f5f9;
+    }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; }
+    .input-row { 
+      text-align: center; 
+      margin-bottom: 20px; 
+    }
+    .input-row input {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      width: 220px;
+    }
+    .input-row button {
+      padding: 8px 16px;
+      margin-left: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .input-row button:hover { background: #0056b3; }
+
+    #matchesContainer { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      gap: 20px; 
+    }
+
+    .card { 
+      background: white; 
+      border-radius: 10px; 
+      padding: 16px; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+      transition: transform 0.2s; 
+    }
+    .card:hover { transform: translateY(-4px); }
+
+    .match-header {
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #444;
+      font-size: 16px;
+    }
+
+    .team { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin: 8px 0; 
+      padding: 6px 10px; 
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .team.home { background: #e3f2fd; color: #0d47a1; }
+    .team.away { background: #ffebee; color: #b71c1c; }
+
+    .team input { 
+      width: 60px; 
+      text-align: center; 
+      padding: 4px;
+      border: 1px solid #aaa; 
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .saveBtn { 
+      margin-top: 12px; 
+      width: 100%; 
+      padding: 8px; 
+      border: none; 
+      border-radius: 6px; 
+      background: #28a745; 
+      color: white; 
+      font-size: 14px;
+      cursor: pointer; 
+      font-weight: 600;
+    }
+    .saveBtn:hover { background: #1e7e34; }
   </style>
 </head>
 <body>
