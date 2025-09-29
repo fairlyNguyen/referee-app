@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách trận đấu</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+    // 👉 Thay config Firebase của bạn ở đây
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
+		authDomain: "fir-demo-a1c99.firebaseapp.com",
+		databaseURL: "https://fir-demo-a1c99.firebaseio.com",
+		projectId: "fir-demo-a1c99",
+		storageBucket: "fir-demo-a1c99.firebasestorage.app",
+		messagingSenderId: "980490887183",
+		appId: "1:980490887183:web:ef665624ab306006d7037a",
+		measurementId: "G-TR0CCTRTGJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function loadAllMatches() {
+      const tourId = document.getElementById("tourInput").value.trim();
+      if (!tourId) return alert("⚠️ Nhập Tournament ID!");
+
+      const path = `tournaments/${tourId}/matches`;
+      const snap = await get(ref(db, path));
+      if (!snap.exists()) return alert("❌ Không tìm thấy trận đấu nào");
+
+      const matches = snap.val();
+      const container = document.getElementById("matchesContainer");
+      container.innerHTML = "";
+
+      Object.entries(matches).forEach(([matchId, data]) => {
+        const home = data.home || "Home";
+        const away = data.away || "Away";
+        const homeScore = data.homeScore ?? 0;
+        const awayScore = data.awayScore ?? 0;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${home} vs ${away}</h3>
+          <div class="row">
+            <label>${home}</label>
+            <input type="number" class="homeScore" value="${homeScore}">
+          </div>
+          <div class="row">
+            <label>${away}</label>
+            <input type="number" class="awayScore" value="${awayScore}">
+          </div>
+          <button class="saveBtn">💾 Lưu</button>
+        `;
+
+        const homeInput = card.querySelector(".homeScore");
+        const awayInput = card.querySelector(".awayScore");
+
+        card.querySelector(".saveBtn").onclick = async () => {
+          await update(ref(db, `${path}/${matchId}`), {
+            homeScore: parseInt(homeInput.value) || 0,
+            awayScore: parseInt(awayInput.value) || 0,
+            state: "ONGOING"
+          });
+          alert(`✅ Đã lưu điểm trận ${matchId}`);
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    window.loadAllMatches = loadAllMatches;
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .input-row { margin-bottom: 20px; }
+    #matchesContainer { display: flex; flex-direction: column; gap: 16px; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; background: #fafafa; }
+    .row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
+    .row input { width: 60px; text-align: center; }
+    button { margin-top: 10px; padding: 6px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Danh sách tất cả trận đấu</h2>
+  <div class="input-row">
+    <input type="text" id="tourInput" placeholder="Nhập Tournament ID">
+    <button onclick="loadAllMatches()">Tải trận đấu</button>
+  </div>
+  <div id="matchesContainer"></div>
+</body>
+</html>
