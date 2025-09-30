@@ -57,14 +57,20 @@ Object.entries(grouped)
 
     const header = document.createElement("h3");
     header.className = "group-header";
-    header.textContent = `🏆 Nhóm ${groupName}`;
+    header.textContent = `🏆 ${groupName}`;
     groupDiv.appendChild(header);
 
     const grid = document.createElement("div");
     grid.className = "group-matches";
 
-    // 👉 Có thể thêm sort trận trong mỗi group theo matchId
-    groupMatches.sort((a, b) => a.matchId.localeCompare(b.matchId));
+    groupMatches.sort((a, b) => {
+  const r1 = a.roundName || "";
+  const r2 = b.roundName || "";
+  if (r1 !== r2) {
+    return r1.localeCompare(r2, "vi", { numeric: true });
+  }
+  return a.matchId.localeCompare(b.matchId, "vi", { numeric: true });
+});
 
     groupMatches.forEach(({ matchId, home, away, homeScore, awayScore }) => {
       const card = document.createElement("div");
