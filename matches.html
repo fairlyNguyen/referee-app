@@ -7,16 +7,15 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
-    // 👉 Thay config Firebase của bạn ở đây
     const firebaseConfig = {
       apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
-		authDomain: "fir-demo-a1c99.firebaseapp.com",
-		databaseURL: "https://fir-demo-a1c99.firebaseio.com",
-		projectId: "fir-demo-a1c99",
-		storageBucket: "fir-demo-a1c99.firebasestorage.app",
-		messagingSenderId: "980490887183",
-		appId: "1:980490887183:web:ef665624ab306006d7037a",
-		measurementId: "G-TR0CCTRTGJ"
+      authDomain: "fir-demo-a1c99.firebaseapp.com",
+      databaseURL: "https://fir-demo-a1c99.firebaseio.com",
+      projectId: "fir-demo-a1c99",
+      storageBucket: "fir-demo-a1c99.firebasestorage.app",
+      messagingSenderId: "980490887183",
+      appId: "1:980490887183:web:ef665624ab306006d7037a",
+      measurementId: "G-TR0CCTRTGJ"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -41,41 +40,67 @@
         const matches = snapshot.val();
         console.log("📌 Matches data:", matches);
 
+        // Group by groupName
+        const grouped = {};
         Object.entries(matches).forEach(([matchId, data]) => {
-          const home = data.home || "Home";
-          const away = data.away || "Away";
-          const homeScore = data.homeScore ?? 0;
-          const awayScore = data.awayScore ?? 0;
-
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <div class="match-header">⚡ Trận: ${matchId}</div>
-            <div class="team home">
-              <span>${home}</span>
-              <input type="number" class="homeScore" value="${homeScore}">
-            </div>
-            <div class="team away">
-              <span>${away}</span>
-              <input type="number" class="awayScore" value="${awayScore}">
-            </div>
-            <button class="saveBtn">💾 Lưu điểm</button>
-          `;
-
-          const homeInput = card.querySelector(".homeScore");
-          const awayInput = card.querySelector(".awayScore");
-
-          card.querySelector(".saveBtn").onclick = async () => {
-            await update(ref(db, `${path}/${matchId}`), {
-              homeScore: parseInt(homeInput.value) || 0,
-              awayScore: parseInt(awayInput.value) || 0,
-              state: "ONGOING"
-            });
-            alert(`✅ Đã lưu điểm trận ${matchId}`);
-          };
-
-          container.appendChild(card);
+          const groupName = data.groupName || "Khác";
+          if (!grouped[groupName]) grouped[groupName] = [];
+          grouped[groupName].push({ matchId, ...data });
         });
+
+        // Render groups theo thứ tự A, B, C...
+Object.entries(grouped)
+  .sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }))
+  .forEach(([groupName, groupMatches]) => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "group";
+
+    const header = document.createElement("h3");
+    header.className = "group-header";
+    header.textContent = `🏆 Nhóm ${groupName}`;
+    groupDiv.appendChild(header);
+
+    const grid = document.createElement("div");
+    grid.className = "group-matches";
+
+    // 👉 Có thể thêm sort trận trong mỗi group theo matchId
+    groupMatches.sort((a, b) => a.matchId.localeCompare(b.matchId));
+
+    groupMatches.forEach(({ matchId, home, away, homeScore, awayScore }) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="match-header">⚡ Trận: ${matchId}</div>
+        <div class="team home">
+          <span>${home || "Home"}</span>
+          <input type="number" class="homeScore" value="${homeScore ?? 0}">
+        </div>
+        <div class="team away">
+          <span>${away || "Away"}</span>
+          <input type="number" class="awayScore" value="${awayScore ?? 0}">
+        </div>
+        <button class="saveBtn">💾 Lưu điểm</button>
+      `;
+
+      const homeInput = card.querySelector(".homeScore");
+      const awayInput = card.querySelector(".awayScore");
+
+      card.querySelector(".saveBtn").onclick = async () => {
+        await update(ref(db, `${path}/${matchId}`), {
+          homeScore: parseInt(homeInput.value) || 0,
+          awayScore: parseInt(awayInput.value) || 0,
+          state: "ONGOING"
+        });
+        alert(`✅ Đã lưu điểm trận ${matchId}`);
+      };
+
+      grid.appendChild(card);
+    });
+
+    groupDiv.appendChild(grid);
+    container.appendChild(groupDiv);
+  });
+
       });
     }
 
@@ -110,11 +135,28 @@
     }
     .input-row button:hover { background: #0056b3; }
 
-    #matchesContainer { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-      gap: 20px; 
-    }
+    #matchesContainer {
+  display: grid;
+  grid-auto-flow: column;         /* sắp xếp theo cột */
+  grid-auto-columns: minmax(280px, 1fr); /* mỗi group 1 cột */
+  gap: 32px;
+  overflow-x: auto;               /* scroll ngang nếu nhiều group */
+  padding-bottom: 10px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.group-matches {
+  display: flex;
+  flex-direction: column;    /* Trận đấu xếp dọc */
+  gap: 20px;
+  overflow-y: auto;          /* Cho phép scroll dọc trong group */
+  padding-right: 8px;        /* tránh dính sát thanh scroll */
+}
 
     .card { 
       background: white; 
