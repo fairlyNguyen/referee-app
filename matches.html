@@ -95,7 +95,7 @@ Object.entries(grouped)
         await update(ref(db, `${path}/${matchId}`), {
           homeScore: parseInt(homeInput.value) || 0,
           awayScore: parseInt(awayInput.value) || 0,
-          state: "ONGOING"
+          state: "FINISHED"
         });
         alert(`✅ Đã lưu điểm trận ${matchId}`);
       };
@@ -226,3 +226,4 @@ Object.entries(grouped)
   <div id="matchesContainer"></div>
 </body>
 </html>
+
