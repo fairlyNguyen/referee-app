@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Danh sách trận đấu</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
@@ -38,9 +39,8 @@
         }
 
         const matches = snapshot.val();
-        console.log("📌 Matches data:", matches);
 
-        // Group by groupName
+        // Group theo groupName
         const grouped = {};
         Object.entries(matches).forEach(([matchId, data]) => {
           const groupName = data.groupName || "Khác";
@@ -48,65 +48,62 @@
           grouped[groupName].push({ matchId, ...data });
         });
 
-        // Render groups theo thứ tự A, B, C...
-Object.entries(grouped)
-  .sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }))
-  .forEach(([groupName, groupMatches]) => {
-    const groupDiv = document.createElement("div");
-    groupDiv.className = "group";
+        // Render từng group
+        Object.entries(grouped)
+          .sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }))
+          .forEach(([groupName, groupMatches]) => {
+            const groupDiv = document.createElement("div");
+            groupDiv.className = "group";
 
-    const header = document.createElement("h3");
-    header.className = "group-header";
-    header.textContent = `🏆 ${groupName}`;
-    groupDiv.appendChild(header);
+            const header = document.createElement("h3");
+            header.className = "group-header";
+            header.textContent = `🏆 ${groupName}`;
+            groupDiv.appendChild(header);
 
-    const grid = document.createElement("div");
-    grid.className = "group-matches";
+            const grid = document.createElement("div");
+            grid.className = "group-matches";
 
-    groupMatches.sort((a, b) => {
-  const r1 = a.roundName || "";
-  const r2 = b.roundName || "";
-  if (r1 !== r2) {
-    return r1.localeCompare(r2, "vi", { numeric: true });
-  }
-  return a.matchId.localeCompare(b.matchId, "vi", { numeric: true });
-});
+            groupMatches.sort((a, b) => {
+              const r1 = a.roundName || "";
+              const r2 = b.roundName || "";
+              if (r1 !== r2) return r1.localeCompare(r2, "vi", { numeric: true });
+              return a.matchId.localeCompare(b.matchId, "vi", { numeric: true });
+            });
 
-    groupMatches.forEach(({ matchId, home, away, homeScore, awayScore }) => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="match-header">⚡ Trận: ${matchId}</div>
-        <div class="team home">
-          <span>${home || "Home"}</span>
-          <input type="number" class="homeScore" value="${homeScore ?? 0}">
-        </div>
-        <div class="team away">
-          <span>${away || "Away"}</span>
-          <input type="number" class="awayScore" value="${awayScore ?? 0}">
-        </div>
-        <button class="saveBtn">💾 Lưu điểm</button>
-      `;
+            groupMatches.forEach(({ matchId, home, away, homeScore, awayScore }) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.innerHTML = `
+                <div class="match-header">⚡ Trận: ${matchId}</div>
+                <div class="team home">
+                  <span>${home || "Home"}</span>
+                  <input type="number" class="homeScore" value="${homeScore ?? 0}">
+                </div>
+                <div class="team away">
+                  <span>${away || "Away"}</span>
+                  <input type="number" class="awayScore" value="${awayScore ?? 0}">
+                </div>
+                <button class="saveBtn">💾 Lưu điểm</button>
+              `;
 
-      const homeInput = card.querySelector(".homeScore");
-      const awayInput = card.querySelector(".awayScore");
+              const homeInput = card.querySelector(".homeScore");
+              const awayInput = card.querySelector(".awayScore");
 
-      card.querySelector(".saveBtn").onclick = async () => {
-        await update(ref(db, `${path}/${matchId}`), {
-          homeScore: parseInt(homeInput.value) || 0,
-          awayScore: parseInt(awayInput.value) || 0,
-          state: "FINISHED"
-        });
-        alert(`✅ Đã lưu điểm trận ${matchId}`);
-      };
+              card.querySelector(".saveBtn").onclick = async () => {
+                await update(ref(db, `${path}/${matchId}`), {
+                  homeScore: parseInt(homeInput.value) || 0,
+                  awayScore: parseInt(awayInput.value) || 0,
+                  state: "FINISHED"
+                });
+                alert(`✅ Đã lưu điểm trận ${matchId}`);
+              };
 
-      grid.appendChild(card);
-    });
+              grid.appendChild(card);
+            });
 
-    groupDiv.appendChild(grid);
-    container.appendChild(groupDiv);
-  });
-
+            groupDiv.appendChild(grid);
+            container.appendChild(groupDiv);
+          });
       });
     }
 
@@ -115,79 +112,98 @@ Object.entries(grouped)
   <style>
     body { 
       font-family: 'Segoe UI', Arial, sans-serif; 
-      padding: 20px; 
+      padding: 16px; 
+      margin: 0;
       background: #f2f5f9;
     }
-    h2 { text-align: center; margin-bottom: 20px; color: #333; }
+    h2 { 
+      text-align: center; 
+      margin-bottom: 20px; 
+      color: #333; 
+      font-size: 22px;
+    }
     .input-row { 
       text-align: center; 
       margin-bottom: 20px; 
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .input-row input {
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 6px;
       border: 1px solid #bbb;
-      width: 220px;
+      width: 240px;
+      font-size: 16px;
     }
     .input-row button {
-      padding: 8px 16px;
-      margin-left: 8px;
+      padding: 10px 16px;
       border: none;
       border-radius: 6px;
       background: #007bff;
       color: white;
       cursor: pointer;
       font-weight: 600;
+      font-size: 15px;
     }
     .input-row button:hover { background: #0056b3; }
 
+    /* Container chính - cuộn ngang nếu nhiều group */
     #matchesContainer {
-  display: grid;
-  grid-auto-flow: column;         /* sắp xếp theo cột */
-  grid-auto-columns: minmax(280px, 1fr); /* mỗi group 1 cột */
-  gap: 32px;
-  overflow-x: auto;               /* scroll ngang nếu nhiều group */
-  padding-bottom: 10px;
-}
-
-.group {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 10px;
+    }
+    .group {
+      flex: 0 0 300px; /* mỗi group chiếm chiều rộng */
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .group-header {
+      text-align: center;
+      font-size: 18px;
+      color: #222;
+      margin: 0;
+    }
+    .group-matches {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.group-matches {
-  display: flex;
-  flex-direction: column;    /* Trận đấu xếp dọc */
-  gap: 20px;
-  overflow-y: auto;          /* Cho phép scroll dọc trong group */
-  padding-right: 8px;        /* tránh dính sát thanh scroll */
+  gap: 14px;
 }
 
     .card { 
-      background: white; 
+      background: #fafafa; 
       border-radius: 10px; 
-      padding: 16px; 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+      padding: 14px; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
       transition: transform 0.2s; 
     }
-    .card:hover { transform: translateY(-4px); }
+    .card:hover { transform: translateY(-2px); }
 
     .match-header {
       font-weight: bold;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       color: #444;
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .team { 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      margin: 8px 0; 
+      margin: 6px 0; 
       padding: 6px 10px; 
       border-radius: 6px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
     }
     .team.home { background: #e3f2fd; color: #0d47a1; }
@@ -196,25 +212,34 @@ Object.entries(grouped)
     .team input { 
       width: 60px; 
       text-align: center; 
-      padding: 4px;
+      padding: 6px;
       border: 1px solid #aaa; 
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 16px; /* tránh zoom iOS */
+      min-height: 36px;
     }
 
     .saveBtn { 
-      margin-top: 12px; 
+      margin-top: 10px; 
       width: 100%; 
-      padding: 8px; 
+      padding: 10px; 
       border: none; 
       border-radius: 6px; 
       background: #28a745; 
       color: white; 
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer; 
       font-weight: 600;
     }
     .saveBtn:hover { background: #1e7e34; }
+
+    /* Responsive nhỏ */
+    @media (max-width: 600px) {
+      h2 { font-size: 18px; }
+      .group { flex: 0 0 260px; }
+      .match-header { font-size: 14px; }
+      .saveBtn { font-size: 14px; padding: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -226,5 +251,3 @@ Object.entries(grouped)
   <div id="matchesContainer"></div>
 </body>
 </html>
-
-
