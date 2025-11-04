@@ -22,6 +22,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // ✅ Check URL param for save permission
+    const urlParams = new URLSearchParams(window.location.search);
+    const isReferBoom = urlParams.get("isRefer") === "boom";
+
     function loadAllMatches() {
       const tourId = document.getElementById("tourInput").value.trim();
       if (!tourId) return alert("⚠️ Nhập Tournament ID!");
@@ -39,16 +43,14 @@
         }
 
         const matches = snapshot.val();
-
-        // Group theo groupName
         const grouped = {};
+
         Object.entries(matches).forEach(([matchId, data]) => {
           const groupName = data.groupName || "Khác";
           if (!grouped[groupName]) grouped[groupName] = [];
           grouped[groupName].push({ matchId, ...data });
         });
 
-        // Render từng group
         Object.entries(grouped)
           .sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }))
           .forEach(([groupName, groupMatches]) => {
@@ -88,8 +90,15 @@
 
               const homeInput = card.querySelector(".homeScore");
               const awayInput = card.querySelector(".awayScore");
+              const saveBtn = card.querySelector(".saveBtn");
 
-              card.querySelector(".saveBtn").onclick = async () => {
+              // ✅ Hide button if not `?isRefer=boom`
+              if (!isReferBoom) {
+                saveBtn.style.display = "none";
+              }
+
+              saveBtn.onclick = async () => {
+                if (!isReferBoom) return; // Safety
                 await update(ref(db, `${path}/${matchId}`), {
                   homeScore: parseInt(homeInput.value) || 0,
                   awayScore: parseInt(awayInput.value) || 0,
@@ -109,6 +118,7 @@
 
     window.loadAllMatches = loadAllMatches;
   </script>
+
   <style>
     body { 
       font-family: 'Segoe UI', Arial, sans-serif; 
@@ -116,130 +126,20 @@
       margin: 0;
       background: #f2f5f9;
     }
-    h2 { 
-      text-align: center; 
-      margin-bottom: 20px; 
-      color: #333; 
-      font-size: 22px;
-    }
-    .input-row { 
-      text-align: center; 
-      margin-bottom: 20px; 
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .input-row input {
-      padding: 10px 14px;
-      border-radius: 6px;
-      border: 1px solid #bbb;
-      width: 240px;
-      font-size: 16px;
-    }
-    .input-row button {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 15px;
-    }
-    .input-row button:hover { background: #0056b3; }
-
-    /* Container chính - cuộn ngang nếu nhiều group */
-    #matchesContainer {
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 10px;
-    }
-    .group {
-      flex: 0 0 300px; /* mỗi group chiếm chiều rộng */
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      scroll-snap-align: start;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .group-header {
-      text-align: center;
-      font-size: 18px;
-      color: #222;
-      margin: 0;
-    }
-    .group-matches {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-    .card { 
-      background: #fafafa; 
-      border-radius: 10px; 
-      padding: 14px; 
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
-      transition: transform 0.2s; 
-    }
-    .card:hover { transform: translateY(-2px); }
-
-    .match-header {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #444;
-      font-size: 15px;
-    }
-
-    .team { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin: 6px 0; 
-      padding: 6px 10px; 
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-    }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; font-size: 22px; }
+    .input-row { text-align: center; margin-bottom: 20px; display: flex; justify-content: center; gap: 8px; }
+    .input-row input { padding: 10px; border-radius: 6px; border: 1px solid #bbb; width: 240px; font-size: 16px; }
+    .input-row button { padding: 10px 16px; background: #007bff; border: none; color: #fff; border-radius: 6px; font-weight: bold; }
+    #matchesContainer { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; }
+    .group { flex: 0 0 300px; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .group-header { text-align: center; font-size: 18px; }
+    .group-matches { display: flex; flex-direction: column; gap: 14px; }
+    .card { background: #fafafa; border-radius: 10px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .match-header { font-weight: bold; margin-bottom: 10px; }
+    .team { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; }
     .team.home { background: #e3f2fd; color: #0d47a1; }
     .team.away { background: #ffebee; color: #b71c1c; }
-
-    .team input { 
-      width: 60px; 
-      text-align: center; 
-      padding: 6px;
-      border: 1px solid #aaa; 
-      border-radius: 4px;
-      font-size: 16px; /* tránh zoom iOS */
-      min-height: 36px;
-    }
-
-    .saveBtn { 
-      margin-top: 10px; 
-      width: 100%; 
-      padding: 10px; 
-      border: none; 
-      border-radius: 6px; 
-      background: #28a745; 
-      color: white; 
-      font-size: 15px;
-      cursor: pointer; 
-      font-weight: 600;
-    }
-    .saveBtn:hover { background: #1e7e34; }
-
-    /* Responsive nhỏ */
-    @media (max-width: 600px) {
-      h2 { font-size: 18px; }
-      .group { flex: 0 0 260px; }
-      .match-header { font-size: 14px; }
-      .saveBtn { font-size: 14px; padding: 8px; }
-    }
+    .team input { width: 60px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid #aaa; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -251,5 +151,3 @@
   <div id="matchesContainer"></div>
 </body>
 </html>
-
-
