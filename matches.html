@@ -1,42 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Referee Matches</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 20px;
-}
-.match-card {
-  background: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-.match-header {
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #2c3e50;
-}
-.team {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.team input {
-  width: 70px;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  text-align: center;
-  font-size: 14px;
-}
-.saveBtn {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách trận đấu</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
+      authDomain: "fir-demo-a1c99.firebaseapp.com",
+      databaseURL: "https://fir-demo-a1c99.firebaseio.com",
+      projectId: "fir-demo-a1c99",
+      storageBucket: "fir-demo-a1c99.firebasestorage.app",
+      messagingSenderId: "980490887183",
+      appId: "1:980490887183:web:ef665624ab306006d7037a",
+      measurementId: "G-TR0CCTRTGJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ✅ Check URL param for save permission
+    const urlParams = new URLSearchParams(window.location.search);
+    const isReferBoom = urlParams.get("isRefer") === "boom";
+
+    function loadAllMatches() {
+      const tourId = document.getElementById("tourInput").value.trim();
+      if (!tourId) return alert("⚠️ Nhập Tournament ID!");
+
+      const path = `tournaments/${tourId}/matches`;
+      const matchesRef = ref(db, path);
+
+      onValue(matchesRef, (snapshot) => {
+        const container = document.getElementById("matchesContainer");
+        container.innerHTML = "";
+
+        if (!snapshot.exists()) {
+          container.innerHTML = "<p>❌ Không tìm thấy trận đấu nào</p>";
+          return;
+        }
+
+        const matches = snapshot.val();
+        const grouped = {};
+
+        Object.entries(matches).forEach(([matchId, data]) => {
+          const groupName = data.groupName || "Khác";
+          if (!grouped[groupName]) grouped[groupName] = [];
+          grouped[groupName].push({ matchId, ...data });
+        });
+
+        Object.entries(grouped)
+          .sort(([a], [b]) => a.localeCompare(b, "vi", { numeric: true }))
+          .forEach(([groupName, groupMatches]) => {
+            const groupDiv = document.createElement("div");
+            groupDiv.className = "group";
+
+            const header = document.createElement("h3");
+            header.className = "group-header";
+            header.textContent = `🏆 ${groupName}`;
+            groupDiv.appendChild(header);
+
+            const grid = document.createElement("div");
+            grid.className = "group-matches";
+
+            groupMatches.sort((a, b) => {
+              const r1 = a.roundName || "";
+              const r2 = b.roundName || "";
+              if (r1 !== r2) return r1.localeCompare(r2, "vi", { numeric: true });
+              return a.matchId.localeCompare(b.matchId, "vi", { numeric: true });
+            });
+
+            groupMatches.forEach(({ matchId, home, away, homeScore, awayScore }) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.innerHTML = `
+                <div class="match-header">⚡ Trận: ${matchId}</div>
+                <div class="team home">
+                  <span>${home || "Home"}</span>
+                  <input type="number" class="homeScore" value="${homeScore ?? 0}">
+                </div>
+                <div class="team away">
+                  <span>${away || "Away"}</span>
+                  <input type="number" class="awayScore" value="${awayScore ?? 0}">
+                </div>
+                <button class="saveBtn">💾 Lưu điểm</button>
+              `;
+
+              const homeInput = card.querySelector(".homeScore");
+              const awayInput = card.querySelector(".awayScore");
+              const saveBtn = card.querySelector(".saveBtn");
+
+              // ✅ Hide button if not `?isRefer=boom`
+              if (!isReferBoom) {
+                saveBtn.style.display = "none";
+              }
+
+              saveBtn.onclick = async () => {
+                if (!isReferBoom) return; // Safety
+                await update(ref(db, `${path}/${matchId}`), {
+                  homeScore: parseInt(homeInput.value) || 0,
+                  awayScore: parseInt(awayInput.value) || 0,
+                  state: "FINISHED"
+                });
+                alert(`✅ Đã lưu điểm trận ${matchId}`);
+              };
+
+              grid.appendChild(card);
+            });
+
+            groupDiv.appendChild(grid);
+            container.appendChild(groupDiv);
+          });
+      });
+    }
+
+    window.loadAllMatches = loadAllMatches;
+  </script>
+
+  <style>
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      padding: 16px; 
+      margin: 0;
+      background: #f2f5f9;
+    }
+    h2 { text-align: center; margin-bottom: 20px; color: #333; font-size: 22px; }
+    .input-row { text-align: center; margin-bottom: 20px; display: flex; justify-content: center; gap: 8px; }
+    .input-row input { padding: 10px; border-radius: 6px; border: 1px solid #bbb; width: 240px; font-size: 16px; }
+    .input-row button { padding: 10px 16px; background: #007bff; border: none; color: #fff; border-radius: 6px; font-weight: bold; }
+    #matchesContainer { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; }
+    .group { flex: 0 0 300px; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .group-header { text-align: center; font-size: 18px; }
+    .group-matches { display: flex; flex-direction: column; gap: 14px; }
+    .card { background: #fafafa; border-radius: 10px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .match-header { font-weight: bold; margin-bottom: 10px; }
+    .team { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; }
+    .team.home { background: #e3f2fd; color: #0d47a1; }
+    .team.away { background: #ffebee; color: #b71c1c; }
+    .team input { width: 60px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid #aaa; font-size: 16px; }
+    saveBtn {
   margin-top: 10px;
   width: 100%;
   padding: 12px;
@@ -45,86 +149,21 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+
   background: linear-gradient(90deg, #00c853, #009624);
   color: #fff;
   letter-spacing: 0.5px;
   box-shadow: 0 4px 8px rgba(0, 150, 0, 0.25);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.saveBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 150, 0, 0.35);
-}
-.saveBtn:active {
-  transform: scale(0.97);
-}
-.ref-badge {
-  margin-top: 8px;
-  display: none;
-  text-align: center;
-  font-size: 13px;
-  padding: 6px 8px;
-  background: #ffe0b2;
-  color: #e65100;
-  border-radius: 6px;
-  border: 1px dashed #ff9800;
-}
-</style>
+  </style>
 </head>
 <body>
-<h2>Match Scores</h2>
-<div id="matchList"></div>
-<script>
-const params = new URLSearchParams(window.location.search);
-const isReferBoom = params.get("isRefer") === "boom";
-
-const matches = [
-  {id: 1, home: "Team A", away: "Team B", homeScore: 0, awayScore: 0},
-  {id: 2, home: "Team C", away: "Team D", homeScore: 0, awayScore: 0},
-];
-
-const list = document.getElementById("matchList");
-
-matches.forEach(match => {
-  const card = document.createElement("div");
-  card.className = "match-card";
-  const {id, home, away, homeScore, awayScore} = match;
-  card.innerHTML = `
-    <div class="match-header">⚡ Trận: ${id}</div>
-
-    <div class="team home">
-      <span>${home}</span>
-      <input type="number" class="homeScore" value="${homeScore}">
-    </div>
-
-    <div class="team away">
-      <span>${away}</span>
-      <input type="number" class="awayScore" value="${awayScore}">
-    </div>
-
-    <button class="saveBtn">✅ Lưu điểm</button>
-    <div class="ref-badge">⚠️ Chỉ trọng tài được phép nhập</div>
-  `;
-
-  const saveBtn = card.querySelector(".saveBtn");
-  const badge = card.querySelector(".ref-badge");
-
-  if (!isReferBoom) {
-    saveBtn.style.display = "none";
-    badge.style.display = "block";
-  } else {
-    badge.style.display = "none";
-  }
-
-  saveBtn?.addEventListener("click", () => {
-    const hs = card.querySelector(".homeScore").value;
-    const as = card.querySelector(".awayScore").value;
-    console.log(`Save match ${id}:`, hs, as);
-    alert("✅ Saved!");
-  });
-
-  list.appendChild(card);
-});
-</script>
+  <h2>Danh sách tất cả trận đấu</h2>
+  <div class="input-row">
+    <input type="text" id="tourInput" placeholder="Nhập Tournament ID" value="ac1e32e7-1811-44fb-8e7d-3d50779bbcdb">
+    <button onclick="loadAllMatches()">Tải trận đấu</button>
+  </div>
+  <div id="matchesContainer"></div>
 </body>
 </html>
