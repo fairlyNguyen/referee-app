@@ -76,7 +76,7 @@
               const card = document.createElement("div");
               card.className = "card";
               card.innerHTML = `
-                <div class="match-header">⚡ Trận: ${matchId}</div>
+                <div class="match-header">⚡ Trận:</div>
                 <div class="team home">
                   <span>${home || "Home"}</span>
                   <input type="number" class="homeScore" value="${homeScore ?? 0}">
@@ -177,10 +177,11 @@
 <body>
   <h2>Danh sách tất cả trận đấu</h2>
   <div class="input-row">
-    <input type="text" id="tourInput" placeholder="Nhập Tournament ID" value="ac1e32e7-1811-44fb-8e7d-3d50779bbcdb">
+    <input type="text" id="tourInput" placeholder="Nhập Tournament ID" value="7c388045-fce2-4595-b653-a215239e4b34">
     <button onclick="loadAllMatches()">Tải trận đấu</button>
   </div>
   <div id="matchesContainer"></div>
 </body>
 </html>
+
 
