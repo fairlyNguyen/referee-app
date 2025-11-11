@@ -140,21 +140,37 @@
     .team.home { background: #e3f2fd; color: #0d47a1; }
     .team.away { background: #ffebee; color: #b71c1c; }
     .team input { width: 60px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid #aaa; font-size: 16px; }
-    saveBtn {
+    .saveBtn {
   margin-top: 10px;
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
 
-  background: linear-gradient(90deg, #00c853, #009624);
+  background: linear-gradient(135deg, #00d46a, #00a94b);
   color: #fff;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 8px rgba(0, 150, 0, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  box-shadow: 0 6px 14px rgba(0, 200, 83, 0.25);
+  transition: 
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.saveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0, 200, 83, 0.35);
+  filter: brightness(1.05);
+}
+
+.saveBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 200, 83, 0.2);
+  filter: brightness(0.95);
 }
   </style>
 </head>
@@ -167,3 +183,4 @@
   <div id="matchesContainer"></div>
 </body>
 </html>
+
