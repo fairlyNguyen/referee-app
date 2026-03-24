@@ -111,8 +111,24 @@
     .away .player-num { background: rgba(255,92,106,.15); color: var(--away); }
     .player-name { font-size: 13px; font-weight: 500; line-height: 1.2; }
     .player-name.tbd { color: var(--muted); font-style: italic; }
-    .serve-icon { font-size: 13px; opacity: 0; transition: opacity .25s; flex-shrink: 0; }
-    .serve-icon.active { opacity: 1; }
+    /* swap button inline with team-tag */
+    .team-header {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; margin-bottom: 10px;
+    }
+    .team.away .team-header { flex-direction: row-reverse; }
+    .swap-btn {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px; cursor: pointer;
+      transition: background .15s, color .15s;
+      letter-spacing: .3px;
+    }
+    .swap-btn:hover { background: var(--border); color: var(--text); }
+    .swap-btn:active { transform: scale(.95); }
 
     .score-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .score-value {
@@ -170,41 +186,69 @@
       50%      { border-color: rgba(245,197,24,.6); }
     }
 
-    /* Announce bar */
-    .serve-announce {
-      display: flex; align-items: stretch;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+    /* Big serve display */
+    .serve-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      gap: 12px;
     }
-    .announce-seg {
-      flex: 1; text-align: center;
-      padding: 10px 6px;
-      border-right: 1px solid var(--border);
-    }
-    .announce-seg:last-child { border-right: none; }
-    .announce-label {
-      font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+
+    .serve-team-block { display: flex; flex-direction: column; align-items: flex-start; }
+    .serve-team-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 2px;
       color: var(--muted); text-transform: uppercase; margin-bottom: 3px;
     }
-    .announce-value {
+    .serve-team-value {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: 1px; line-height: 1;
-      transition: color .2s;
+      font-size: 30px; letter-spacing: 1px; line-height: 1;
+      transition: color .25s;
     }
-    .team-home { color: var(--home); }
-    .team-away { color: var(--away); }
 
-    /* Pip row */
-    .pip-row {
-      display: flex; gap: 5px; justify-content: center; margin-top: 5px;
+    /* Pip-based serve number — big and obvious */
+    .serve-num-block {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .serve-num-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .serve-pips {
+      display: flex; gap: 8px;
     }
     .serve-pip {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--border);
-      transition: background .25s, box-shadow .25s;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid var(--border);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; color: var(--muted);
+      transition: all .25s;
     }
-    .serve-pip.active { background: var(--server); box-shadow: 0 0 7px var(--server); }
-    .serve-pip.used   { background: var(--muted); }
+    .serve-pip.active {
+      background: var(--server);
+      border-color: var(--server);
+      color: #000;
+      box-shadow: 0 0 10px rgba(245,197,24,.5);
+    }
+    .serve-pip.used {
+      background: var(--border);
+      border-color: var(--border);
+      color: var(--muted);
+    }
+    /* first serve: pip1 crossed out */
+    .serve-pip.blocked {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--border);
+      text-decoration: line-through;
+      opacity: .4;
+    }
 
     /* Serve controls */
     .serve-controls {
@@ -230,6 +274,8 @@
     .serve-btn small {
       display: block; font-size: 11px; font-weight: 400; opacity: .65; margin-top: 2px;
     }
+    .team-home { color: var(--home); }
+    .team-away { color: var(--away); }
 
     /* Status */
     .status-bar {
@@ -305,17 +351,18 @@
   <div class="scoreboard">
 
     <div class="team home">
-      <div class="team-tag">Home</div>
+      <div class="team-header">
+        <div class="team-tag" style="margin-bottom:0">Home</div>
+        <button class="swap-btn" id="swapHome">⇅ Đổi</button>
+      </div>
       <div class="players">
         <div class="player-row" data-player="p1h">
-          <div class="player-num">1</div>
+          <div class="player-num">2</div>
           <div class="player-name tbd" id="homeP1">—</div>
-          <div class="serve-icon" id="icon-p1h">🏓</div>
         </div>
         <div class="player-row" data-player="p2h">
-          <div class="player-num">2</div>
+          <div class="player-num">1</div>
           <div class="player-name tbd" id="homeP2">—</div>
-          <div class="serve-icon" id="icon-p2h">🏓</div>
         </div>
       </div>
       <div class="score-wrap">
@@ -334,15 +381,16 @@
     </div>
 
     <div class="team away">
-      <div class="team-tag">Away</div>
+      <div class="team-header">
+        <div class="team-tag" style="margin-bottom:0">Away</div>
+        <button class="swap-btn" id="swapAway">⇅ Đổi</button>
+      </div>
       <div class="players">
         <div class="player-row" data-player="p1a">
-          <div class="serve-icon" id="icon-p1a">🏓</div>
           <div class="player-name tbd" id="awayP1">—</div>
           <div class="player-num">1</div>
         </div>
         <div class="player-row" data-player="p2a">
-          <div class="serve-icon" id="icon-p2a">🏓</div>
           <div class="player-name tbd" id="awayP2">—</div>
           <div class="player-num">2</div>
         </div>
@@ -364,26 +412,24 @@
 
     <!-- First-serve warning -->
     <div class="first-serve-badge hidden" id="firstServeBadge">
-      ⚠️ Quả giao đầu trận — chỉ 1 lượt giao (người số 2 giao trước)
+      ⚠️ Quả giao đầu trận — đội giao chỉ có 1 lượt
     </div>
 
-    <!-- Announce bar: ĐỘI · NGƯỜI · LƯỢT -->
-    <div class="serve-announce">
-      <div class="announce-seg">
-        <div class="announce-label">Đội giao</div>
-        <div class="announce-value" id="announceTeam">—</div>
+    <!-- Big serve display -->
+    <div class="serve-display">
+      <div class="serve-team-block">
+        <div class="serve-team-label">Đội đang giao</div>
+        <div class="serve-team-value team-home" id="serveTeamVal">—</div>
       </div>
-      <div class="announce-seg">
-        <div class="announce-label">Người giao</div>
-        <div class="announce-value" id="announcePlayer">—</div>
-        <div class="pip-row">
-          <div class="serve-pip" id="pip1"></div>
-          <div class="serve-pip" id="pip2"></div>
+
+      <div class="serve-num-block">
+        <div class="serve-num-label">Lượt giao</div>
+        <div class="serve-pips">
+          <!-- pip1: lượt 1 — bị gạch khi first serve -->
+          <div class="serve-pip" id="pip1">1</div>
+          <!-- pip2: lượt 2 / lượt duy nhất khi first serve -->
+          <div class="serve-pip" id="pip2">2</div>
         </div>
-      </div>
-      <div class="announce-seg">
-        <div class="announce-label">Lượt giao</div>
-        <div class="announce-value" id="announceServe" style="color:var(--server)">—</div>
       </div>
     </div>
 
@@ -391,7 +437,7 @@
     <div class="serve-controls">
       <button class="serve-btn btn-fault" id="faultBtn">
         ✗ Fault
-        <small>lỗi → đổi người giao</small>
+        <small>lỗi → đổi lượt / side out</small>
       </button>
       <button class="serve-btn btn-sideout" id="sideoutBtn">
         ⇄ Side Out
@@ -420,7 +466,7 @@
   import { initializeApp }      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
   import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-   const firebaseConfig = { 
+  const firebaseConfig = { 
 		apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
 		authDomain: "fir-demo-a1c99.firebaseapp.com",
 		databaseURL: "https://fir-demo-a1c99.firebaseio.com",
@@ -458,8 +504,7 @@
    */
   let serve = {
     team:         "home",
-    player:       2,
-    serveNumber:  2,
+    serveNumber:  2,   // quả đầu: chỉ lượt 2
     isFirstServe: true,
   };
 
@@ -474,64 +519,68 @@
 
   // ── Serve render ───────────────────────────────────────────────────────────
   function renderServe() {
+    // Team label
     const teamLabel = serve.team === "home" ? "HOME" : "AWAY";
-    const teamCls   = "announce-value team-" + serve.team;
+    const tv = $("serveTeamVal");
+    tv.textContent = teamLabel;
+    tv.className   = "serve-team-value team-" + serve.team;
 
-    $("announceTeam").textContent = teamLabel;
-    $("announceTeam").className   = teamCls;
-
-    $("announcePlayer").textContent = "P" + serve.player;
-    $("announceServe").textContent  = serve.serveNumber + (serve.serveNumber === 1 ? "st" : "nd");
-
-    // Pips: visualise lượt 1 / lượt 2
+    // Pips
     if (serve.isFirstServe) {
-      // Quả đầu: chỉ lượt 2 → pip1 grayed, pip2 sáng
+      // Quả đầu: chỉ 1 lượt → pip1 blocked (không dùng), pip2 active
+      $("pip1").className = "serve-pip blocked";
+      $("pip2").className = "serve-pip active";
+    } else if (serve.serveNumber === 1) {
+      // Lượt 1 đang giao
+      $("pip1").className = "serve-pip active";
+      $("pip2").className = "serve-pip";
+    } else {
+      // Lượt 2 đang giao (lượt 1 đã dùng)
       $("pip1").className = "serve-pip used";
       $("pip2").className = "serve-pip active";
-    } else {
-      $("pip1").className = serve.serveNumber === 1 ? "serve-pip active" : "serve-pip used";
-      $("pip2").className = serve.serveNumber === 2 ? "serve-pip active" : "serve-pip";
     }
 
-    // Racket icon
-    ["p1h","p2h","p1a","p2a"].forEach(id => $("icon-"+id).classList.remove("active"));
-    const iconKey = serve.team === "home"
-      ? (serve.player === 1 ? "p1h" : "p2h")
-      : (serve.player === 1 ? "p1a" : "p2a");
-    $("icon-"+iconKey).classList.add("active");
+    // (no icon highlighting — removed)
 
     // First-serve badge
     $("firstServeBadge").classList.toggle("hidden", !serve.isFirstServe);
   }
 
   // ── Fault ──────────────────────────────────────────────────────────────────
-  // Fault = người đang giao lỗi.
-  // Quả đầu / lượt 2 → side out ngay.
-  // Lượt 1 → chuyển sang người 2 (lượt 2).
+  // Quả đầu trận / lượt 2 → side out ngay
+  // Lượt 1 → chuyển sang lượt 2 (cùng đội)
   function onFault() {
     if (serve.isFirstServe || serve.serveNumber === 2) {
       doSideOut();
     } else {
-      // Lượt 1 → đổi sang người kia, lượt 2
-      serve.player      = serve.player === 1 ? 2 : 1;
       serve.serveNumber = 2;
       renderServe();
-      toast("Fault → " + (serve.team === "home" ? "HOME" : "AWAY")
-            + " P" + serve.player + " · lượt 2");
+      toast("Fault → " + (serve.team === "home" ? "HOME" : "AWAY") + " · lượt 2");
     }
   }
 
   // ── Side Out ───────────────────────────────────────────────────────────────
   function doSideOut() {
     serve.team        = serve.team === "home" ? "away" : "home";
-    serve.player      = 1;
     serve.serveNumber = 1;
     serve.isFirstServe = false;
     renderServe();
     toast("Side Out → " + (serve.team === "home" ? "HOME" : "AWAY") + " giao · lượt 1");
   }
 
+  // ── Swap players within a team ───────────────────────────────────────────
+  function swapTeam(team) {
+    if (team === "home") {
+      [homePlayers[0], homePlayers[1]] = [homePlayers[1], homePlayers[0]];
+    } else {
+      [awayPlayers[0], awayPlayers[1]] = [awayPlayers[1], awayPlayers[0]];
+    }
+    renderPlayers();
+    toast((team === "home" ? "HOME" : "AWAY") + " ⇅ đổi vị trí 1 ↔ 2");
+  }
+
   // ── Score update ───────────────────────────────────────────────────────────
+  // Theo luật pickleball: khi đội đang GIAO ghi điểm → họ swap vị trí với nhau
   async function updateScore(team, delta) {
     if (!currentMatchId) return toast("Chưa load trận");
     const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
@@ -540,8 +589,13 @@
 
     if (team === "home") homeScore = Math.max(0, homeScore + delta);
     else                 awayScore = Math.max(0, awayScore + delta);
-    renderScores();
 
+    // Auto-swap: đội giao ghi điểm → hai người trong đội đó đổi vị trí
+    if (delta > 0 && team === serve.team) {
+      swapTeam(team);
+    }
+
+    renderScores();
     await update(ref(db, path), { homeScore, awayScore, state: "ONGOING", isChangeSides: false });
   }
 
@@ -596,7 +650,7 @@
     homeScore      = d.homeScore ?? 0;
     awayScore      = d.awayScore ?? 0;
 
-    serve = { team: "home", player: 2, serveNumber: 2, isFirstServe: true };
+    serve = { team: "home", serveNumber: 2, isFirstServe: true };
 
     renderPlayers();
     renderScores();
@@ -607,24 +661,39 @@
 
   // ── Change sides ───────────────────────────────────────────────────────────
   async function changeSides() {
-    if (!currentMatchId) return toast("Chưa load trận");
-    const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-    const snap = await get(ref(db, path));
-    if (snap.exists() && snap.val().state === "FINISHED") return toast("Trận đã kết thúc");
+  if (!currentMatchId) return toast("Chưa load trận");
 
-    [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
-    [homeScore, awayScore]     = [awayScore, homeScore];
-    serve.team = serve.team === "home" ? "away" : "home";
+  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+  const snap = await get(ref(db, path));
+  if (snap.exists() && snap.val().state === "FINISHED") return toast("Trận đã kết thúc");
 
-    renderPlayers(); renderScores(); renderServe();
+  // ✅ Swap team
+  [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
 
-    await update(ref(db, path), {
-      home: homePlayers.join("-"),
-      away: awayPlayers.join("-"),
-      homeScore, awayScore, isChangeSides: true
-    });
-    toast("⇄ Đổi sân");
-  }
+  // ✅ FIX QUAN TRỌNG: swap luôn vị trí trong từng team
+  homePlayers = [homePlayers[1], homePlayers[0]];
+  awayPlayers = [awayPlayers[1], awayPlayers[0]];
+
+  // Score swap như cũ
+  [homeScore, awayScore] = [awayScore, homeScore];
+
+  // Serve team đổi
+  serve.team = serve.team === "home" ? "away" : "home";
+
+  renderPlayers();
+  renderScores();
+  renderServe();
+
+  await update(ref(db, path), {
+    home: homePlayers.join("-"),
+    away: awayPlayers.join("-"),
+    homeScore,
+    awayScore,
+    isChangeSides: true
+  });
+
+  toast("⇄ Đổi sân (giữ đúng vị trí)");
+ }
 
   // ── Set done ───────────────────────────────────────────────────────────────
   async function setDone() {
@@ -643,6 +712,8 @@
     btn.addEventListener("click", () => updateScore(btn.dataset.team, parseInt(btn.dataset.delta)))
   );
 
+  $("swapHome").addEventListener("click", () => swapTeam("home"));
+  $("swapAway").addEventListener("click", () => swapTeam("away"));
   $("faultBtn").addEventListener("click", onFault);
   $("sideoutBtn").addEventListener("click", doSideOut);
   $("changeSidesBtn").addEventListener("click", changeSides);
@@ -650,19 +721,7 @@
     if (!$("doneBtn").classList.contains("off")) setDone();
   });
 
-  // Tap player row để set thủ công ai đang giao
-  document.querySelectorAll(".player-row").forEach(row => {
-    row.addEventListener("click", () => {
-      if (!currentMatchId) return;
-      const key = row.dataset.player;          // p1h / p2h / p1a / p2a
-      serve.team        = key.endsWith("h") ? "home" : "away";
-      serve.player      = key.startsWith("p1") ? 1 : 2;
-      serve.serveNumber = serve.player;         // P1 → lượt 1, P2 → lượt 2
-      serve.isFirstServe = false;
-      renderServe();
-      toast("Giao: " + (serve.team === "home" ? "HOME" : "AWAY") + " P" + serve.player);
-    });
-  });
+  // (player-row click removed — swap done via ⇅ button)
 </script>
 </body>
 </html>
