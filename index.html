@@ -1,281 +1,426 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>STM Referee</title>
- <style>
-body {
-  font-family: 'Arial', sans-serif;
-  background: #f4f6f9;
-  padding: 20px;
-  margin: 0;
-}
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-}
-.card {
-  max-width: 900px;
-  margin: 0 auto 30px auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Input rows */
-.input-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-.input-row input {
-  flex: 1;
-  padding: 10px 12px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-.input-row button {
-  padding: 10px 16px;
-  background-color: #007bff;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.input-row button:hover {
-  background-color: #0056b3;
-}
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161a23;
+      --surface2: #1c2130;
+      --border:   #252b38;
+      --home:     #3b8bff;
+      --away:     #ff5c6a;
+      --text:     #eef0f6;
+      --muted:    #6b7280;
+      --server:   #f5c518;
+      --green:    #22c55e;
+      --radius:   16px;
+    }
 
-/* Match area layout */
-.match-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 48px;
+    }
 
-/* Scoreboxes */
-.score-box {
-  width: 130px;
-  padding: 18px;
-  border-radius: 12px;
-  background: #f0f0f0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.score-box.home { background: #e3f2fd; }
-.score-box.away { background: #fce4ec; }
-.score-header { font-weight: bold; margin-bottom: 10px; font-size: 16px; }
-.score-controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.score-controls button {
-  width: 36px;
-  height: 36px;
-  font-size: 20px;
-  border-radius: 50%;
-  border: none;
-  background: #ddd;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.score-controls button:hover { background: #bbb; }
-.score-controls input {
-  width: 60px;
-  text-align: center;
-  font-size: 18px;
-  padding: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
+    header { text-align: center; margin-bottom: 24px; }
+    header .label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px; letter-spacing: 4px; color: var(--muted);
+    }
+    header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px; letter-spacing: 3px; line-height: 1;
+    }
 
-/* Court container */
-.court-container {
-  flex: 1;
-  max-width: 400px;
-  position: relative;
-}
+    .card {
+      width: 100%; max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
 
-/* Court itself */
-.court {
-  width: 100%;
-  padding-top: 60%; /* aspect ratio */
-  background: #dcedc8;
-  border: 3px solid #2e7d32;
-  border-radius: 12px;
-  position: relative;
-}
-.court-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #2e7d32;
-  transform: translateY(-1px);
-}
-.court-vertical {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 100%;
-  background: #2e7d32;
-}
+    /* Lookup */
+    .lookup {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .lookup-row { display: flex; gap: 8px; }
+    .lookup input {
+      flex: 1; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; padding: 9px 12px; outline: none;
+      transition: border-color .2s;
+    }
+    .lookup input::placeholder { color: var(--muted); }
+    .lookup input:focus { border-color: var(--home); }
+    .lookup button {
+      background: var(--home); border: none; border-radius: 10px;
+      color: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      padding: 9px 18px; cursor: pointer; transition: opacity .2s;
+    }
+    .lookup button:hover { opacity: .85; }
 
-/* Players inside court */
-.player {
-  position: absolute;
-  width: 25%;
-  min-width: 60px;
-  padding: 4px;
-  text-align: center;
-  background: rgba(255,255,255,0.95);
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.2s;
-}
-.player:hover { transform: scale(1.05); }
-.home.top-left { top: 5%; left: 5%; }
-.home.bottom-left { bottom: 5%; left: 5%; }
-.away.top-right { top: 5%; right: 5%; }
-.away.bottom-right { bottom: 5%; right: 5%; }
+    /* Scoreboard */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+    }
+    .team { display: flex; flex-direction: column; padding: 20px 16px 18px; }
+    .team.home { align-items: flex-start; }
+    .team.away { align-items: flex-end; }
+    .team-tag {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .home .team-tag { color: var(--home); }
+    .away .team-tag { color: var(--away); }
 
-/* Swap buttons */
-.swap-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 15px;
-}
-.swap-buttons button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  background: #ff9800;
-  color: #fff;
-  transition: background 0.2s;
-}
-.swap-buttons button:hover { background: #e67e00; }
+    .players { display: flex; flex-direction: column; gap: 5px; flex: 1; margin-bottom: 16px; }
+    .player-row {
+      display: flex; align-items: center; gap: 7px;
+      cursor: pointer; border-radius: 8px; padding: 4px 6px;
+      transition: background .15s;
+    }
+    .player-row:hover { background: rgba(255,255,255,.04); }
+    .home .player-row { flex-direction: row; }
+    .away .player-row { flex-direction: row-reverse; }
 
-/* Action buttons */
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-.actions button {
-  flex: 1;
-  padding: 12px;
-  font-weight: bold;
-  font-size: 15px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-#changeSidesBtn { background: #28a745; color: #fff; }
-#changeSidesBtn:hover { background: #1e7e34; }
-#doneBtn { background: #dc3545; color: #fff; }
-#doneBtn:hover { background: #b02a37; }
+    .player-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .2s, color .2s;
+    }
+    .home .player-num { background: rgba(59,139,255,.15); color: var(--home); }
+    .away .player-num { background: rgba(255,92,106,.15); color: var(--away); }
+    .player-name { font-size: 13px; font-weight: 500; line-height: 1.2; }
+    .player-name.tbd { color: var(--muted); font-style: italic; }
+    .serve-icon { font-size: 13px; opacity: 0; transition: opacity .25s; flex-shrink: 0; }
+    .serve-icon.active { opacity: 1; }
 
-/* Responsive for mobile */
-@media (max-width: 700px) {
-  .match-area {
-    flex-direction: column;
-    align-items: center;
-  }
-  .score-box {
-    width: 90%;
-    margin-bottom: 10px;
-  }
-  .court-container {
-    width: 90%;
-    max-width: none;
-  }
-}
+    .score-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .score-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 68px; line-height: 1; min-width: 56px; text-align: center;
+    }
+    .score-btns { display: flex; gap: 6px; }
+    .score-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--text); font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .score-btn.plus { border-color: var(--home); color: var(--home); }
+    .score-btn.plus:hover { background: rgba(59,139,255,.15); }
+    .score-btn.minus { color: var(--muted); }
+    .score-btn.minus:hover { background: var(--border); }
 
-.first-server {
-  background-color: #fff3cd; /* màu vàng nhạt */
-  border: 2px solid #ffc107; /* viền vàng */
-  box-shadow: 0 0 12px #ffc107;
-  transform: scale(1.1);
-}
-</style>
+    .vs-col {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px 0; gap: 8px;
+    }
+    .vs-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px; letter-spacing: 2px; color: var(--muted);
+    }
+    .vs-divider { width: 1px; flex: 1; background: var(--border); }
+
+    /* ── SERVE TRACKER ── */
+    .serve-tracker {
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 14px 16px 16px;
+    }
+    .serve-tracker-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 12px; text-align: center;
+    }
+
+    /* First-serve warning */
+    .first-serve-badge {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      background: rgba(245,197,24,.08);
+      border: 1px solid rgba(245,197,24,.3);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
+      font-size: 12px; font-weight: 500; color: #d4a800;
+      animation: badgePulse 2s infinite;
+    }
+    .first-serve-badge.hidden { display: none; }
+    @keyframes badgePulse {
+      0%,100% { border-color: rgba(245,197,24,.25); }
+      50%      { border-color: rgba(245,197,24,.6); }
+    }
+
+    /* Announce bar */
+    .serve-announce {
+      display: flex; align-items: stretch;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+    }
+    .announce-seg {
+      flex: 1; text-align: center;
+      padding: 10px 6px;
+      border-right: 1px solid var(--border);
+    }
+    .announce-seg:last-child { border-right: none; }
+    .announce-label {
+      font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 3px;
+    }
+    .announce-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 1px; line-height: 1;
+      transition: color .2s;
+    }
+    .team-home { color: var(--home); }
+    .team-away { color: var(--away); }
+
+    /* Pip row */
+    .pip-row {
+      display: flex; gap: 5px; justify-content: center; margin-top: 5px;
+    }
+    .serve-pip {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--border);
+      transition: background .25s, box-shadow .25s;
+    }
+    .serve-pip.active { background: var(--server); box-shadow: 0 0 7px var(--server); }
+    .serve-pip.used   { background: var(--muted); }
+
+    /* Serve controls */
+    .serve-controls {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .serve-btn {
+      padding: 11px 8px; border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: opacity .2s, transform .1s; text-align: center;
+      line-height: 1.4;
+    }
+    .serve-btn:active { transform: scale(.97); }
+    .btn-fault {
+      background: rgba(245,197,24,.13); color: var(--server);
+      border: 1px solid rgba(245,197,24,.3);
+    }
+    .btn-fault:hover { background: rgba(245,197,24,.22); }
+    .btn-sideout {
+      background: rgba(255,255,255,.05); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-sideout:hover { background: rgba(255,255,255,.1); }
+    .serve-btn small {
+      display: block; font-size: 11px; font-weight: 400; opacity: .65; margin-top: 2px;
+    }
+
+    /* Status */
+    .status-bar {
+      padding: 9px 18px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+    .status-dot.live {
+      background: var(--green); box-shadow: 0 0 7px #22c55e88;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .status-text { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .status-text.live { color: var(--green); }
+
+    /* Actions */
+    .actions {
+      padding: 14px 16px 18px; border-top: 1px solid var(--border);
+      display: flex; gap: 8px;
+    }
+    .action-btn {
+      flex: 1; padding: 12px; border: none; border-radius: 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity .2s, transform .1s;
+    }
+    .action-btn:active { transform: scale(.98); }
+    .btn-sides { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-sides:hover { background: var(--border); }
+    .btn-done { background: var(--green); color: #fff; }
+    .btn-done:hover { opacity: .88; }
+    .btn-done.off { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1e2530; border: 1px solid var(--border);
+      border-radius: 12px; padding: 11px 18px;
+      font-size: 13px; font-weight: 500; color: var(--text);
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; z-index: 999; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 400px) {
+      .score-value { font-size: 54px; }
+      .team { padding: 16px 12px 14px; }
+      .announce-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="label">Live Match</div>
+  <h1>STM Referee</h1>
+</header>
 
 <div class="card">
-  <div class="input-row">
-    <input type="text" id="tourInput" placeholder="Enter Tournament ID" value="5401c8aa-f76f-4f49-b5fa-77341e1a4afb">
-  </div>
-  <div class="input-row">
-    <input type="text" id="matchInput" placeholder="Enter Match ID" value = "">
-    <button id="findBtn">Find</button>
-  </div>
 
-  <div class="match-area">
-    <!-- Home Scorebox left -->
-    <div class="score-box home">
-      <span class="score-header">Home: <span id="homeName">--</span></span>
-      <div class="score-controls">
-        <button data-team="home" data-delta="-1">-</button>
-        <input type="number" id="homeScore" min="0" max="99" value="0">
-        <button data-team="home" data-delta="1">+</button>
-      </div>
+  <!-- Lookup -->
+  <div class="lookup">
+    <div class="lookup-row">
+      <input id="tourInput" placeholder="Tournament ID" value="5401c8aa-f76f-4f49-b5fa-77341e1a4afb">
     </div>
-
-    <!-- Court in middle -->
-    <div class="court-container">
-      <div class="court">
-        <div class="court-line"></div>
-        <div class="court-vertical"></div>
-        <div class="player home top-left" id="homePlayer1">Home --</div>
-        <div class="player home bottom-left" id="homePlayer2">Home --</div>
-        <div class="player away top-right" id="awayPlayer1">Away --</div>
-        <div class="player away bottom-right" id="awayPlayer2">Away --</div>
-      </div>
-
-      <div class="swap-buttons">
-        <button id="swapHomeBtn">🔄 Swap Home Positions</button>
-        <button id="swapAwayBtn">🔄 Swap Away Positions</button>
-      </div>
-    </div>
-
-    <!-- Away Scorebox right -->
-    <div class="score-box away">
-      <span class="score-header">Away: <span id="awayName">--</span></span>
-      <div class="score-controls">
-        <button data-team="away" data-delta="-1">-</button>
-        <input type="number" id="awayScore" min="0" max="99" value="0">
-        <button data-team="away" data-delta="1">+</button>
-      </div>
+    <div class="lookup-row">
+      <input id="matchInput" placeholder="Match ID">
+      <button id="findBtn">Find</button>
     </div>
   </div>
 
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+
+    <div class="team home">
+      <div class="team-tag">Home</div>
+      <div class="players">
+        <div class="player-row" data-player="p1h">
+          <div class="player-num">1</div>
+          <div class="player-name tbd" id="homeP1">—</div>
+          <div class="serve-icon" id="icon-p1h">🏓</div>
+        </div>
+        <div class="player-row" data-player="p2h">
+          <div class="player-num">2</div>
+          <div class="player-name tbd" id="homeP2">—</div>
+          <div class="serve-icon" id="icon-p2h">🏓</div>
+        </div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-value" id="homeScoreDisplay">0</div>
+        <div class="score-btns">
+          <button class="score-btn minus" data-team="home" data-delta="-1">−</button>
+          <button class="score-btn plus"  data-team="home" data-delta="1">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-col">
+      <div class="vs-divider"></div>
+      <div class="vs-text">VS</div>
+      <div class="vs-divider"></div>
+    </div>
+
+    <div class="team away">
+      <div class="team-tag">Away</div>
+      <div class="players">
+        <div class="player-row" data-player="p1a">
+          <div class="serve-icon" id="icon-p1a">🏓</div>
+          <div class="player-name tbd" id="awayP1">—</div>
+          <div class="player-num">1</div>
+        </div>
+        <div class="player-row" data-player="p2a">
+          <div class="serve-icon" id="icon-p2a">🏓</div>
+          <div class="player-name tbd" id="awayP2">—</div>
+          <div class="player-num">2</div>
+        </div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-value" id="awayScoreDisplay">0</div>
+        <div class="score-btns">
+          <button class="score-btn minus" data-team="away" data-delta="-1">−</button>
+          <button class="score-btn plus"  data-team="away" data-delta="1">+</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── SERVE TRACKER ── -->
+  <div class="serve-tracker">
+    <div class="serve-tracker-title">Serve Tracker · Pickleball</div>
+
+    <!-- First-serve warning -->
+    <div class="first-serve-badge hidden" id="firstServeBadge">
+      ⚠️ Quả giao đầu trận — chỉ 1 lượt giao (người số 2 giao trước)
+    </div>
+
+    <!-- Announce bar: ĐỘI · NGƯỜI · LƯỢT -->
+    <div class="serve-announce">
+      <div class="announce-seg">
+        <div class="announce-label">Đội giao</div>
+        <div class="announce-value" id="announceTeam">—</div>
+      </div>
+      <div class="announce-seg">
+        <div class="announce-label">Người giao</div>
+        <div class="announce-value" id="announcePlayer">—</div>
+        <div class="pip-row">
+          <div class="serve-pip" id="pip1"></div>
+          <div class="serve-pip" id="pip2"></div>
+        </div>
+      </div>
+      <div class="announce-seg">
+        <div class="announce-label">Lượt giao</div>
+        <div class="announce-value" id="announceServe" style="color:var(--server)">—</div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="serve-controls">
+      <button class="serve-btn btn-fault" id="faultBtn">
+        ✗ Fault
+        <small>lỗi → đổi người giao</small>
+      </button>
+      <button class="serve-btn btn-sideout" id="sideoutBtn">
+        ⇄ Side Out
+        <small>đổi bên giao bóng</small>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <div class="status-text" id="statusText">No match loaded</div>
+  </div>
+
+  <!-- Actions -->
   <div class="actions">
-    <button id="changeSidesBtn">🔄 Change Sides</button>
-    <button id="doneBtn">🏁 Set Done</button>
+    <button class="action-btn btn-sides" id="changeSidesBtn">⇄ Đổi sân</button>
+    <button class="action-btn btn-done off" id="doneBtn">🏁 Kết thúc</button>
   </div>
+
 </div>
 
+<div class="toast" id="toast"></div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+<script type="module">
+  import { initializeApp }      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-    const firebaseConfig = { 
+   const firebaseConfig = { 
 		apiKey: "AIzaSyD6tKItFtCJDYDxSLClLjJDqdR0scsU4kg",
 		authDomain: "fir-demo-a1c99.firebaseapp.com",
 		databaseURL: "https://fir-demo-a1c99.firebaseio.com",
@@ -285,274 +430,239 @@ h2 {
 		appId: "1:980490887183:web:ef665624ab306006d7037a",
 		measurementId: "G-TR0CCTRTGJ"
 	};
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
 
-    let currentMatchId = null;
-    let currentTourId = null;
-	let currentServer = null;
+  const $ = id => document.getElementById(id);
 
+  // ── App State ──────────────────────────────────────────────────────────────
+  let currentMatchId = null;
+  let currentTourId  = null;
+  let homePlayers    = ["", ""];
+  let awayPlayers    = ["", ""];
+  let homeScore      = 0;
+  let awayScore      = 0;
 
-    const playerIds = ["homePlayer1","homePlayer2","awayPlayer1","awayPlayer2"];
-
-    const $ = id => document.getElementById(id);
-
-    function getPlayerName(id) {
-      return $(id)?.textContent.replace("🎾","").trim() || "";
-    }
-
-    function highlightServer(playerId) {
-      playerIds.forEach(id => {
-        const el = $(id);
-        el.classList.remove("first-server","flash");
-        el.textContent = getPlayerName(id);
-      });
-      if (!playerId) return;
-      const el = $(playerId);
-      el.classList.add("first-server","flash");
-      el.textContent = "🎾 " + getPlayerName(playerId);
-      setTimeout(() => el.classList.remove("flash"), 800);
-    }
-
-    function swapPlayers(team) {
-      const [p1, p2] = team === "home" ? ["homePlayer1","homePlayer2"] : ["awayPlayer1","awayPlayer2"];
-      const t1 = $(p1).textContent;
-      $(p1).textContent = $(p2).textContent;
-      $(p2).textContent = t1;
-    }
-
-    function changeScore(team, delta) {
-      const input = $(team + "Score");
-      input.value = Math.max(0, (parseInt(input.value) || 0) + delta);
-    }
-
-    document.querySelectorAll(".score-controls button").forEach(btn => {
-      btn.addEventListener("click", () => changeScore(btn.dataset.team, parseInt(btn.dataset.delta)));
-    });
-
-    async function loadMatch() {
-  const matchId = $("matchInput").value.trim();
-  const tourId = $("tourInput").value.trim();
-  if (!matchId || !tourId) return alert("Enter Tournament and Match IDs");
-
-  const path = `tournaments/${tourId}/matches/${matchId}`;
-  const snap = await get(ref(db, path));
-  if (!snap.exists()) return alert("Match not found");
-
-  const data = snap.val();
-  currentMatchId = matchId;
-  currentTourId = tourId;
-
-  // --- Parse players from data ---
-  // Expecting format "Player1-Player2"
-  homePlayers = (data.home || "Home1-Home2").split(/\s*[-–—+]\s*/).map(p => p.trim());
-  awayPlayers = (data.away || "Away1-Away2").split(/\s*[-–—+]\s*/).map(p => p.trim());
-	console.log("players", {homePlayers, awayPlayers})
-
-  // --- Update player elements on court ---
-  $("homePlayer1").textContent = homePlayers[0];
-  $("homePlayer2").textContent = homePlayers[1];
-  $("awayPlayer1").textContent = awayPlayers[0];
-  $("awayPlayer2").textContent = awayPlayers[1];
-
-  // --- Update score fields ---
-  $("homeScore").value = data.homeScore ?? 0;
-  $("awayScore").value = data.awayScore ?? 0;
-
-  // --- Update names display ---
-  $("homeName").textContent = homePlayers.join(" - ");
-  $("awayName").textContent = awayPlayers.join(" - ");
-
-  // --- Highlight current server ---
-  currentServer = data.currentServer || null;
-  highlightServer(currentServer);
-
-  console.log("✅ Match loaded successfully!", { homePlayers, awayPlayers, currentServer });
-}
-
-
-  async function updateMatch() {
-  if (!currentMatchId || !currentTourId) return alert("Load a match first!");
-
-  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-  const snap = await get(ref(db, path));
-  const data = snap.exists() ? snap.val() : {};
-  
-  const matchState = data.state
-  if(matchState == "FINISHED") {
-	  return alert("Match already finished. Cannot update.");
-  }
-
-  const newHomeScore = parseInt($("homeScore").value) || 0;
-  const newAwayScore = parseInt($("awayScore").value) || 0;
-
-  // Determine which team scored
-  let scoringTeam = null;
-  if (newHomeScore > (data.homeScore || 0)) scoringTeam = "home";
-  else if (newAwayScore > (data.awayScore || 0)) scoringTeam = "away";
-
-  // Update local currentServer only if score changed
-  if (scoringTeam) {
-    const teamIds = scoringTeam === "home" ? ["homePlayer1","homePlayer2"] : ["awayPlayer1","awayPlayer2"];
-    currentServer = currentServer === teamIds[0] ? teamIds[1] : teamIds[0];
-	swapPlayers(scoringTeam);     
-  }
-
-  // Highlight UI
-  highlightServer(currentServer);
-
-  // Push only scores to Firebase, NOT currentServer
-  await update(ref(db, path), {
-    homeScore: newHomeScore,
-    awayScore: newAwayScore,
-    state: "ONGOING",
-	isChangeSides: false
-  });
-
-  console.log("✅ Match updated:", { newHomeScore, newAwayScore, currentServer });
-}
-
-// Keep track of players globally
-let homePlayers = [];
-let awayPlayers = [];
-
-async function changeSides() {
-  if (!currentMatchId || !currentTourId) {
-    return alert("Please load a match first before changing sides.");
-  }
-
-  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-  const snap = await get(ref(db, path));
-  const data = snap.exists() ? snap.val() : {};
-
-  const matchState = data.state;
-  if (matchState === "FINISHED") {
-    return alert("Match already finished. Cannot update.");
-  }
-
-  console.log("🔄 Changing sides...");
-
-  //Swap players in memory
-  [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
-
-  // Swap scores from UI
-  const homeScoreEl = $("homeScore");
-  const awayScoreEl = $("awayScore");
-  const newHomeScore = parseInt(awayScoreEl.value) || 0;
-  const newAwayScore = parseInt(homeScoreEl.value) || 0;
-
-  // Swap server (map sang player cùng vị trí ở đội kia)
-  function getNewServerId(oldServerId) {
-    if (!oldServerId) return null;
-    const map = {
-      "homePlayer1": "awayPlayer2",
-      "homePlayer2": "awayPlayer1",
-      "awayPlayer1": "homePlayer2",
-      "awayPlayer2": "homePlayer1",
-    };
-    return map[oldServerId] || null;
-  }
-  let newServerId = getNewServerId(currentServer);
-
-  // Prepare data for Firebase
-  const updateData = {
-    home: homePlayers.join("-"),
-    away: awayPlayers.join("-"),
-    homeScore: newHomeScore,
-    awayScore: newAwayScore,
-    currentServer: newServerId,
-    isChangeSides: true
+  /**
+   * Pickleball serve state machine
+   *
+   *  LUẬT:
+   *  • Quả đầu trận: đội giao chỉ được 1 lượt (luôn là người số 2, "second server")
+   *  • Bình thường : lượt 1 (P1) → fault → lượt 2 (P2) → fault → side out → đội kia lượt 1
+   *
+   *  State fields:
+   *    team         : "home" | "away"
+   *    player       : 1 | 2
+   *    serveNumber  : 1 | 2   (lượt trong lượt đội đó)
+   *    isFirstServe : true    (chỉ true cho quả giao đầu tiên của cả trận)
+   */
+  let serve = {
+    team:         "home",
+    player:       2,
+    serveNumber:  2,
+    isFirstServe: true,
   };
 
-  await update(ref(db, path), updateData);
-  currentServer = newServerId
-  highlightServer(currentServer);
-  
-  // Update UI players
-  $("homePlayer1").textContent = homePlayers[0];
-  $("homePlayer2").textContent = homePlayers[1];
-  $("awayPlayer1").textContent = awayPlayers[0];
-  $("awayPlayer2").textContent = awayPlayers[1];
-
-  $("homeName").textContent = homePlayers.join(" - ");
-  $("awayName").textContent = awayPlayers.join(" - ");
-
-  $("homeScore").value = newHomeScore;
-  $("awayScore").value = newAwayScore;
-  swapTeamPositions("home");
-  swapTeamPositions("away");
-
-  console.log("✅ Sides changed and data successfully saved to Firebase!");
-}
-
-async function swapTeamPositions(team) {
-  const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-  const snap = await get(ref(db, path));
-  const data = snap.exists() ? snap.val() : {};
-  
-  const matchState = data.state
-  if(matchState == "FINISHED") {
-	  return alert("Match already finished. Cannot update.");
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  function toast(msg, ms = 2400) {
+    const el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove("show"), ms);
   }
-  
-  if (team === "home") {
-    const p1 = $("homePlayer1");
-    const p2 = $("homePlayer2");
-    [p1.textContent, p2.textContent] = [p2.textContent, p1.textContent];
-    [homePlayers[0], homePlayers[1]] = [homePlayers[1], homePlayers[0]];
-  } else if (team === "away") {
-    const p1 = $("awayPlayer1");
-    const p2 = $("awayPlayer2");
-    [p1.textContent, p2.textContent] = [p2.textContent, p1.textContent];
-    [awayPlayers[0], awayPlayers[1]] = [awayPlayers[1], awayPlayers[0]];
-  }
-  console.log(`✅ ${team} team positions swapped`);
-}
 
+  // ── Serve render ───────────────────────────────────────────────────────────
+  function renderServe() {
+    const teamLabel = serve.team === "home" ? "HOME" : "AWAY";
+    const teamCls   = "announce-value team-" + serve.team;
 
-const buttons = document.querySelectorAll('button[data-delta]');
-buttons.forEach(button => {
-  button.addEventListener('click', () => {
-    updateMatch();
-  });
-});
+    $("announceTeam").textContent = teamLabel;
+    $("announceTeam").className   = teamCls;
 
+    $("announcePlayer").textContent = "P" + serve.player;
+    $("announceServe").textContent  = serve.serveNumber + (serve.serveNumber === 1 ? "st" : "nd");
 
-async function setDone() {
-      if (!currentMatchId || !currentTourId) return;
-	  
-	 const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
-	const snap = await get(ref(db, path));
-	const data = snap.exists() ? snap.val() : {};
-  
-	const matchState = data.state
-	if(matchState == "FINISHED") {
-	  return alert("Match already finished. Cannot update.");
-	}
-  
-      await update(ref(db, path), { 
-	  isChangeSides: false,
-	  state: "FINISHED" });
-      highlightServer("");
-	  
-      alert("🏁 Match Done");
+    // Pips: visualise lượt 1 / lượt 2
+    if (serve.isFirstServe) {
+      // Quả đầu: chỉ lượt 2 → pip1 grayed, pip2 sáng
+      $("pip1").className = "serve-pip used";
+      $("pip2").className = "serve-pip active";
+    } else {
+      $("pip1").className = serve.serveNumber === 1 ? "serve-pip active" : "serve-pip used";
+      $("pip2").className = serve.serveNumber === 2 ? "serve-pip active" : "serve-pip";
     }
 
-    $("findBtn").addEventListener("click", loadMatch);
-    $("changeSidesBtn").addEventListener("click", changeSides);
-    $("doneBtn").addEventListener("click", setDone);
-	$("swapHomeBtn").addEventListener("click", () => swapTeamPositions("home"));
-	$("swapAwayBtn").addEventListener("click", () => swapTeamPositions("away"));
+    // Racket icon
+    ["p1h","p2h","p1a","p2a"].forEach(id => $("icon-"+id).classList.remove("active"));
+    const iconKey = serve.team === "home"
+      ? (serve.player === 1 ? "p1h" : "p2h")
+      : (serve.player === 1 ? "p1a" : "p2a");
+    $("icon-"+iconKey).classList.add("active");
 
-    playerIds.forEach(id => {
-      $(id).addEventListener("click", async () => {
-		currentServer = id;
-        highlightServer(id);
-      });
+    // First-serve badge
+    $("firstServeBadge").classList.toggle("hidden", !serve.isFirstServe);
+  }
+
+  // ── Fault ──────────────────────────────────────────────────────────────────
+  // Fault = người đang giao lỗi.
+  // Quả đầu / lượt 2 → side out ngay.
+  // Lượt 1 → chuyển sang người 2 (lượt 2).
+  function onFault() {
+    if (serve.isFirstServe || serve.serveNumber === 2) {
+      doSideOut();
+    } else {
+      // Lượt 1 → đổi sang người kia, lượt 2
+      serve.player      = serve.player === 1 ? 2 : 1;
+      serve.serveNumber = 2;
+      renderServe();
+      toast("Fault → " + (serve.team === "home" ? "HOME" : "AWAY")
+            + " P" + serve.player + " · lượt 2");
+    }
+  }
+
+  // ── Side Out ───────────────────────────────────────────────────────────────
+  function doSideOut() {
+    serve.team        = serve.team === "home" ? "away" : "home";
+    serve.player      = 1;
+    serve.serveNumber = 1;
+    serve.isFirstServe = false;
+    renderServe();
+    toast("Side Out → " + (serve.team === "home" ? "HOME" : "AWAY") + " giao · lượt 1");
+  }
+
+  // ── Score update ───────────────────────────────────────────────────────────
+  async function updateScore(team, delta) {
+    if (!currentMatchId) return toast("Chưa load trận");
+    const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+    const snap = await get(ref(db, path));
+    if (snap.exists() && snap.val().state === "FINISHED") return toast("Trận đã kết thúc");
+
+    if (team === "home") homeScore = Math.max(0, homeScore + delta);
+    else                 awayScore = Math.max(0, awayScore + delta);
+    renderScores();
+
+    await update(ref(db, path), { homeScore, awayScore, state: "ONGOING", isChangeSides: false });
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function renderScores() {
+    $("homeScoreDisplay").textContent = homeScore;
+    $("awayScoreDisplay").textContent = awayScore;
+  }
+
+  function renderPlayers() {
+    [["homeP1",0],["homeP2",1]].forEach(([id,i]) => {
+      const el = $(id);
+      el.textContent = homePlayers[i] || "—";
+      el.className   = "player-name" + (homePlayers[i] ? "" : " tbd");
     });
+    [["awayP1",0],["awayP2",1]].forEach(([id,i]) => {
+      const el = $(id);
+      el.textContent = awayPlayers[i] || "—";
+      el.className   = "player-name" + (awayPlayers[i] ? "" : " tbd");
+    });
+  }
 
-    console.log("✅ JS Loaded");
-  </script>
+  function setStatus(state) {
+    const dot  = $("statusDot");
+    const text = $("statusText");
+    dot.className = "status-dot";
+    if (state === "ONGOING")  {
+      dot.classList.add("live");
+      text.textContent = "LIVE"; text.className = "status-text live";
+    } else if (state === "FINISHED") {
+      text.textContent = "FINISHED"; text.className = "status-text";
+    } else {
+      text.textContent = "Scheduled"; text.className = "status-text";
+    }
+    $("doneBtn").className = "action-btn btn-done" + (state === "FINISHED" ? " off" : "");
+  }
+
+  // ── Load match ─────────────────────────────────────────────────────────────
+  async function loadMatch() {
+    const matchId = $("matchInput").value.trim();
+    const tourId  = $("tourInput").value.trim();
+    if (!matchId || !tourId) return toast("⚠️ Nhập đầy đủ ID");
+
+    const snap = await get(ref(db, `tournaments/${tourId}/matches/${matchId}`));
+    if (!snap.exists()) return toast("❌ Không tìm thấy trận");
+    const d = snap.val();
+
+    currentMatchId = matchId;
+    currentTourId  = tourId;
+    homePlayers    = (d.home || "").split(/\s*[-–—+]\s*/).map(p => p.trim());
+    awayPlayers    = (d.away || "").split(/\s*[-–—+]\s*/).map(p => p.trim());
+    homeScore      = d.homeScore ?? 0;
+    awayScore      = d.awayScore ?? 0;
+
+    serve = { team: "home", player: 2, serveNumber: 2, isFirstServe: true };
+
+    renderPlayers();
+    renderScores();
+    renderServe();
+    setStatus(d.state || "SCHEDULED");
+    toast("✅ Đã load trận");
+  }
+
+  // ── Change sides ───────────────────────────────────────────────────────────
+  async function changeSides() {
+    if (!currentMatchId) return toast("Chưa load trận");
+    const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+    const snap = await get(ref(db, path));
+    if (snap.exists() && snap.val().state === "FINISHED") return toast("Trận đã kết thúc");
+
+    [homePlayers, awayPlayers] = [awayPlayers, homePlayers];
+    [homeScore, awayScore]     = [awayScore, homeScore];
+    serve.team = serve.team === "home" ? "away" : "home";
+
+    renderPlayers(); renderScores(); renderServe();
+
+    await update(ref(db, path), {
+      home: homePlayers.join("-"),
+      away: awayPlayers.join("-"),
+      homeScore, awayScore, isChangeSides: true
+    });
+    toast("⇄ Đổi sân");
+  }
+
+  // ── Set done ───────────────────────────────────────────────────────────────
+  async function setDone() {
+    if (!currentMatchId) return;
+    const path = `tournaments/${currentTourId}/matches/${currentMatchId}`;
+    await update(ref(db, path), { isChangeSides: false, state: "FINISHED" });
+    setStatus("FINISHED");
+    toast("🏁 Trận kết thúc!");
+  }
+
+  // ── Events ─────────────────────────────────────────────────────────────────
+  $("findBtn").addEventListener("click", loadMatch);
+  $("matchInput").addEventListener("keydown", e => e.key === "Enter" && loadMatch());
+
+  document.querySelectorAll(".score-btn").forEach(btn =>
+    btn.addEventListener("click", () => updateScore(btn.dataset.team, parseInt(btn.dataset.delta)))
+  );
+
+  $("faultBtn").addEventListener("click", onFault);
+  $("sideoutBtn").addEventListener("click", doSideOut);
+  $("changeSidesBtn").addEventListener("click", changeSides);
+  $("doneBtn").addEventListener("click", () => {
+    if (!$("doneBtn").classList.contains("off")) setDone();
+  });
+
+  // Tap player row để set thủ công ai đang giao
+  document.querySelectorAll(".player-row").forEach(row => {
+    row.addEventListener("click", () => {
+      if (!currentMatchId) return;
+      const key = row.dataset.player;          // p1h / p2h / p1a / p2a
+      serve.team        = key.endsWith("h") ? "home" : "away";
+      serve.player      = key.startsWith("p1") ? 1 : 2;
+      serve.serveNumber = serve.player;         // P1 → lượt 1, P2 → lượt 2
+      serve.isFirstServe = false;
+      renderServe();
+      toast("Giao: " + (serve.team === "home" ? "HOME" : "AWAY") + " P" + serve.player);
+    });
+  });
+</script>
 </body>
 </html>
-
