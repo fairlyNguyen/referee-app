@@ -659,6 +659,20 @@
     toast("✅ Đã load trận");
   }
 
+  // ── Load from URL params ───────────────────────────────────────────────────
+  function loadFromUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const tourID = params.get("tourID");
+    const matchID = params.get("matchID");
+
+    if (tourID && matchID) {
+      $("tourInput").value = tourID;
+      $("matchInput").value = matchID;
+      // Auto-load after a short delay to ensure DOM is ready
+      setTimeout(() => loadMatch(), 100);
+    }
+  }
+
   // ── Change sides ───────────────────────────────────────────────────────────
   async function changeSides() {
   if (!currentMatchId) return toast("Chưa load trận");
@@ -720,6 +734,9 @@
   $("doneBtn").addEventListener("click", () => {
     if (!$("doneBtn").classList.contains("off")) setDone();
   });
+
+  // ── Initialize: Load from URL params on page load ────────────────────────
+  loadFromUrlParams();
 
   // (player-row click removed — swap done via ⇅ button)
 </script>
