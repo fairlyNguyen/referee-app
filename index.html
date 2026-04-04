@@ -325,6 +325,55 @@
       .team { padding: 16px 12px 14px; }
       .announce-value { font-size: 18px; }
     }
+
+    /* Loading Animation */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 15, 20, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(107, 114, 128, 0.3);
+      border-top-color: var(--home);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 1px;
+      animation: fadeInOut 1.5s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -462,6 +511,12 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Loading Overlay -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loader-spinner"></div>
+  <div class="loading-text">Đang tải trận...</div>
+</div>
+
 <script type="module">
   import { initializeApp }      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
   import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
@@ -519,10 +574,10 @@
 
   // ── Serve render ───────────────────────────────────────────────────────────
   function renderServe() {
-    // Team label
-    const teamLabel = serve.team === "home" ? "HOME" : "AWAY";
+    // Team label - show player names (e.g., "A-B" or "Player1-Player2")
+    const teamLabel = serve.team === "home" ? homePlayers.join("-") : awayPlayers.join("-");
     const tv = $("serveTeamVal");
-    tv.textContent = teamLabel;
+    tv.textContent = teamLabel || (serve.team === "home" ? "HOME" : "AWAY");
     tv.className   = "serve-team-value team-" + serve.team;
 
     // Pips
@@ -555,7 +610,8 @@
     } else {
       serve.serveNumber = 2;
       renderServe();
-      toast("Fault → " + (serve.team === "home" ? "HOME" : "AWAY") + " · lượt 2");
+      const teamName = serve.team === "home" ? homePlayers.join("-") : awayPlayers.join("-");
+      toast("Fault → " + (teamName || (serve.team === "home" ? "HOME" : "AWAY")) + " · lượt 2");
     }
   }
 
@@ -565,7 +621,8 @@
     serve.serveNumber = 1;
     serve.isFirstServe = false;
     renderServe();
-    toast("Side Out → " + (serve.team === "home" ? "HOME" : "AWAY") + " giao · lượt 1");
+    const teamName = serve.team === "home" ? homePlayers.join("-") : awayPlayers.join("-");
+    toast("Side Out → " + (teamName || (serve.team === "home" ? "HOME" : "AWAY")) + " giao · lượt 1");
   }
 
   // ── Swap players within a team ───────────────────────────────────────────
@@ -640,7 +697,10 @@
     if (!matchId || !tourId) return toast("⚠️ Nhập đầy đủ ID");
 
     const snap = await get(ref(db, `tournaments/${tourId}/matches/${matchId}`));
-    if (!snap.exists()) return toast("❌ Không tìm thấy trận");
+    if (!snap.exists()) {
+      $("loadingOverlay").classList.add("hidden");
+      return toast("❌ Không tìm thấy trận");
+    }
     const d = snap.val();
 
     currentMatchId = matchId;
@@ -657,6 +717,9 @@
     renderServe();
     setStatus(d.state || "SCHEDULED");
     toast("✅ Đã load trận");
+
+    // Hide loading overlay after successful load
+    $("loadingOverlay").classList.add("hidden");
   }
 
   // ── Load from URL params ───────────────────────────────────────────────────
@@ -665,7 +728,9 @@
     const tourID = params.get("tourID");
     const matchID = params.get("matchID");
 
+    // Only show loading and load if BOTH parameters are present
     if (tourID && matchID) {
+      $("loadingOverlay").classList.remove("hidden");
       $("tourInput").value = tourID;
       $("matchInput").value = matchID;
       // Auto-load after a short delay to ensure DOM is ready
