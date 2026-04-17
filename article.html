@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ETest Apple News onion 041026 regression: loaded with embeds">
+    <title>ETest Apple News onion 041026 regression: loaded with embeds</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary: #c8102e;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #222;
+            background: #f8f8f8;
+        }
+        
+        .header { background: #fff; border-bottom: 4px solid var(--primary); padding: 15px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-family: 'Roboto', sans-serif; font-size: 28px; font-weight: 700; color: var(--primary); text-decoration: none; }
+        
+        .top-bar { background: #111; color: #fff; font-size: 14px; padding: 8px 0; text-align: center; }
+        
+        .article-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 300px; gap: 40px; }
+        .main-content { background: #fff; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        .article-title { font-family: 'Roboto', sans-serif; font-size: 42px; line-height: 1.1; font-weight: 700; margin-bottom: 15px; }
+        .article-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; font-size: 15px; color: #555; }
+        .author { color: var(--primary); text-decoration: none; font-weight: 500; }
+        
+        .content p { font-size: 18px; margin-bottom: 24px; }
+        .content h1, .content h2 { font-family: 'Roboto', sans-serif; margin: 35px 0 15px; }
+        
+        .pull-quote {
+            background: #f4f4f4;
+            border-left: 6px solid var(--primary);
+            padding: 25px 30px;
+            margin: 35px 0;
+            font-style: italic;
+            font-size: 22px;
+        }
+        
+        /* ==================== DUMMY EMBEDS ==================== */
+        .dummy-embed {
+            margin: 40px 0;
+            padding: 15px;
+            border: 3px dashed #c8102e;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .dummy-embed h4 {
+            font-family: 'Roboto', sans-serif;
+            color: #c8102e;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .youtube-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 8px;
+        }
+        .youtube-embed iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .instagram-embed {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .facebook-embed {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .vimeo-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .vimeo-embed iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .sidebar { background: #fff; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); height: fit-content; position: sticky; top: 100px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        Friday, April 17, 2026 • Da Nang, Vietnam • Test Page with Dummy Embeds
+    </div>
+
+    <header class="header">
+        <div class="nav-container">
+            <a href="#" class="logo">INQUIRER</a>
+            <div style="display: flex; gap: 25px; font-family: 'Roboto', sans-serif; font-weight: 500;">
+                <a href="#" style="color:#111;text-decoration:none;">NEWS</a>
+                <a href="#" style="color:#111;text-decoration:none;">WEATHER</a>
+                <a href="#" style="color:#111;text-decoration:none;">APPLE NEWS TEST</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="article-container">
+        <article class="main-content">
+            <div class="article-meta">
+                <span>E test</span>
+                <span>by <a href="#" class="author">Author Test</a></span>
+                <span>Published April 10, 2026, 8:53 a.m. ET</span>
+            </div>
+
+            <h1 class="article-title">ETest Apple News onion 041026 regression: loaded with embeds</h1>
+            <h2 style="font-size:24px;margin-bottom:30px;">Pennsylvania hit by E. coli illnesses linked to tainted romaine lettuce from California</h2>
+
+            <div class="content">
+                <p>Pennsylvania hit by E. coli illnesses linked to tainted romaine lettuce from California content</p>
+                <p>Lorem ipsum dolor sit amet...</p>
+
+                <!-- ==================== DUMMY EMBED 1: YOUTUBE ==================== -->
+                <div class="dummy-embed">
+                    <h4>▶ YOUTUBE EMBED (Dummy - Working)</h4>
+                    <div class="youtube-embed">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/MEYuDENERcw?si=5yWYBnpg5xGVJ-B_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy YouTube embed – fully functional</small>
+                </div>
+
+                <!-- ==================== DUMMY EMBED 2: INSTAGRAM ==================== -->
+                <div class="dummy-embed">
+                    <h4>📸 INSTAGRAM EMBED (Dummy)</h4>
+                    <div class="instagram-embed">
+                        <div style="padding:12px;background:#f8f8f8;display:flex;align-items:center;gap:12px;">
+                            <div style="width:40px;height:40px;background:#c8102e;border-radius:50%;"></div>
+                            <div>
+                                <strong>inquirer</strong><br>
+                                <small>View this post on Instagram</small>
+                            </div>
+                        </div>
+                        <div style="height:380px;background:linear-gradient(#fff,#f0f0f0);display:flex;align-items:center;justify-content:center;font-size:90px;color:#ddd;">
+                            📷
+                        </div>
+                        <div style="padding:12px;font-size:14px;">
+                            Beautiful sunset in Da Nang 🌅<br>
+                            <strong>1.2M likes</strong>
+                        </div>
+                    </div>
+                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy Instagram card</small>
+                </div>
+
+                <!-- ==================== DUMMY EMBED 3: FACEBOOK ==================== -->
+                <div class="dummy-embed">
+                    <h4>👍 FACEBOOK EMBED (Dummy)</h4>
+                    <div class="facebook-embed">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:40px;height:40px;background:#1877f2;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">I</div>
+                            <div><strong>The Philadelphia Inquirer</strong><br><small>Just now</small></div>
+                        </div>
+                        <p style="margin-bottom:12px;">Breaking: Pennsylvania E. coli outbreak linked to romaine lettuce...</p>
+                        <div style="background:#f0f0f0;height:200px;display:flex;align-items:center;justify-content:center;font-size:60px;color:#1877f2;">📺</div>
+                        <div style="margin-top:10px;color:#1877f2;font-size:14px;">👍 4.8K • 💬 892 • Share</div>
+                    </div>
+                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy Facebook post</small>
+                </div>       
+                <!-- ==================== ORIGINAL PLACEHOLDERS (kept for regression test) ==================== -->
+                <div class="dummy-embed" style="border-style:dotted;">
+                    <h4>POWA VIDEO EMBED (Placeholder)</h4>
+                    <div id="video-placeholder-0" 
+					class="featured-media native-video-placeholder" data-video-url="https://d36wdq4x3t6ywe.cloudfront.net/wp-pmn/2019/12/09/5deeb180c9e77c00094dbf8b/5deeb187c9e77c00095e147f_1466500054195-emrowc_t_1575924109328_1280_720_2000.mp4" data-video-image="https://d1dazej9q2gz23.cloudfront.net/01-22-2020/t_a39219be44aa41aeb8ffe8812dca5233_name_5deeb187c9e77c00095e147f_1466500469229_xjc7df_t_1575924109328_1920_1080_5400_.jpg" data-video-index="0"
+				data-video-id="bb4f28f3-f90c-4631-84b4-f7e3f027b3cb"
+				data-video-title="Garland&#39;s video test- updated with new headline"
+				data-video-credit="This is the editor field typed manually"
+				data-caption="Garland&#39;s video test - This is the caption"
+            data-credits="This is the editor field typed manually"
+            data-subtitle="https://d24rgc25bbozho.cloudfront.net/2019/12/09/bb4f28f3-f90c-4631-84b4-f7e3f027b3cb/2_1615452347280/bb4f28f3-f90c-4631-84b4-f7e3f027b3cb_5deeb14cc9e77c00094db8aa.srt"
+            data-dish=""
+            data-is-featured="true"
+            style="width:100%;height:300px;">
+				</div>
+                </div>
+
+                <div class="dummy-embed" style="border-style:dotted;">
+                    <h4>Galleries</h4>
+                    <div id="gallery-placeholder-71"
+        class="article-gallery native-gallery-placeholder"
+        data-gallery-images="[{&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/6RAKN4CH4ZEDHKPUTPX6EMYPZ4.jpg&quot;,&quot;credits&quot;:&quot;Eric Gay \/ AP&quot;,&quot;caption&quot;:&quot;A man wears a face mask as he leaves a business that remains open in downtown San Antonio, Wednesday, April 22, 2020. San Antonio remains under stay-at-home orders due to the COVID-19 outbreak and residents are required to wear face coverings or masks whenever in public. (AP Photo\/Eric Gay)&quot;,&quot;width&quot;:4066,&quot;height&quot;:2425},{&quot;caption&quot;:&quot;People sit outside a soup kitchen waiting their turn to receive free food for their families during a government-ordered lockdown to curb the spread of the new coronavirus, in Buenos Aires, Argentina, Tuesday, April 21, 2020. (AP Photo\/Natacha Pisarenko)&quot;,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/BVKZUIAXENDELJLM3PZIRBU7EI.jpg&quot;,&quot;credits&quot;:&quot;Natacha Pisarenko \/ AP&quot;,&quot;width&quot;:6294,&quot;height&quot;:4097},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington, as Dr. Robert Redfield, director of the Centers for Disease Control and Prevention, listens. (AP Photo\/Alex Brandon)&quot;,&quot;height&quot;:2807,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/BV3FUJCOZ5BN3CD4GJ7TWWRVBE.jpg&quot;,&quot;width&quot;:4210,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington. (AP Photo\/Alex Brandon)&quot;,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;,&quot;width&quot;:4236,&quot;height&quot;:2824,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/PZRH4MNSNFDD3OR6PMZQ4FDLXE.jpg&quot;},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington. (AP Photo\/Alex Brandon)&quot;,&quot;height&quot;:2969,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/JHET72UOCFDSLIRFA5AHIUZDMQ.jpg&quot;,&quot;width&quot;:4454,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;}]"
+        data-gallery-index="71"
+        data-is-featured="false"
+        style="width:100%;height:400px;"></div>
+                </div>
+
+                <p>End of embed test section. All dummy embeds added successfully!</p>
+            </div>
+        </article>
+
+        <aside class="sidebar">
+            <h3>Related Test Articles</h3>
+            <ul style="list-style:none;line-height:2.2;">
+                <li><a href="#" style="color:#c8102e;">Testing standout box</a></li>
+                <li><a href="#" style="color:#c8102e;">Vance's test Vox AI2HTML</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <footer style="background:#111;color:#ccc;padding:60px 20px 30px;text-align:center;margin-top:80px;">
+        <p>© 2026 Inquirer Fusion Dev Test • Hello Apple 20260410 Clone with Dummy Embeds</p>
+        <p style="margin-top:15px;font-size:13px;">✅ YouTube, Vimeo, Instagram-style, Facebook-style dummy embeds added and working.</p>
+    </footer>
+
+    <script>
+        console.log('%c✅ Dummy embeds successfully added and loaded!', 'background:#c8102e;color:#fff;padding:5px 10px;border-radius:4px;font-size:16px');
+    </script>
+</body>
+</html>
