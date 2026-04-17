@@ -1,200 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ETest Apple News onion 041026 regression: loaded with embeds">
-    <title>ETest Apple News onion 041026 regression: loaded with embeds</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Iran calls for human chains to protect power plants as Trump's deadline
+      nears
+    </title>
+
+    <!-- HTL -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://htlbid.com/stage/v3/inquirer-web.com/htlbid.css"
+    />
+    <script>
+      // HashTagLab init — mirrors hashtaglab-service.ts constructor
+      window.htlbid = window.htlbid || {};
+      window.htlbid.cmd = window.htlbid.cmd || [];
+
+      window.__htlbidScriptInjected = true;
+
+      window.htlbid.cmd.push(function() {
+        window.htlbid.layout("universal");
+
+        var now = new Date();
+        var mm = String(now.getMonth() + 1).padStart(2, "0");
+        var dd = String(now.getDate()).padStart(2, "0");
+        var yy = String(now.getFullYear()).slice(2);
+
+        window.htlbid.setTargeting("is_testing", "yes");
+        window.htlbid.setTargeting("day_of_week", String(now.getDay()));
+        window.htlbid.setTargeting("hour", String(now.getHours()));
+        window.htlbid.setTargeting("date", mm + dd + yy);
+        window.htlbid.setTargeting(
+          "url_path",
+          "/news/nation-world/iran-human-chains-united-states-20260407.html"
+        );
+        window.htlbid.setTargeting("article_id", "AAEKZS3EHNFSVFBCUQTBIXFKUU");
+        window.htlbid.setTargeting("content_type", "story");
+        window.htlbid.setTargeting("platform", "fusion");
+        window.htlbid.setTargeting("article_sections", "news,nation-world");
+        window.htlbid.setTargeting("slot_name", "");
+      });
+    </script>
+    <script
+      async
+      src="https://htlbid.com/stage/v3/inquirer-web.com/htlbid.js"
+    ></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
-        
-        :root {
-            --primary: #c8102e;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.6;
-            color: #222;
-            background: #f8f8f8;
-        }
-        
-        .header { background: #fff; border-bottom: 4px solid var(--primary); padding: 15px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-family: 'Roboto', sans-serif; font-size: 28px; font-weight: 700; color: var(--primary); text-decoration: none; }
-        
-        .top-bar { background: #111; color: #fff; font-size: 14px; padding: 8px 0; text-align: center; }
-        
-        .article-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 300px; gap: 40px; }
-        .main-content { background: #fff; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        
-        .article-title { font-family: 'Roboto', sans-serif; font-size: 42px; line-height: 1.1; font-weight: 700; margin-bottom: 15px; }
-        .article-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; font-size: 15px; color: #555; }
-        .author { color: var(--primary); text-decoration: none; font-weight: 500; }
-        
-        .content p { font-size: 18px; margin-bottom: 24px; }
-        .content h1, .content h2 { font-family: 'Roboto', sans-serif; margin: 35px 0 15px; }
-        
-        .pull-quote {
-            background: #f4f4f4;
-            border-left: 6px solid var(--primary);
-            padding: 25px 30px;
-            margin: 35px 0;
-            font-style: italic;
-            font-size: 22px;
-        }
-        
-        /* ==================== DUMMY EMBEDS ==================== */
-        .dummy-embed {
-            margin: 40px 0;
-            padding: 15px;
-            border: 3px dashed #c8102e;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-        
-        .dummy-embed h4 {
-            font-family: 'Roboto', sans-serif;
-            color: #c8102e;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            font-size: 15px;
-            letter-spacing: 1px;
-        }
-        
-        .youtube-embed {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            background: #000;
-            border-radius: 8px;
-        }
-        .youtube-embed iframe {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .instagram-embed {
-            max-width: 400px;
-            margin: 0 auto;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .facebook-embed {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        
-        .vimeo-embed {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-        }
-        .vimeo-embed iframe {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .sidebar { background: #fff; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); height: fit-content; position: sticky; top: 100px; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Georgia, "Times New Roman", serif;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #222;
+      }
+
+      .page-wrapper {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      /* ---- Top banner ---- */
+      .ad-top-banner {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      /* ---- Article header ---- */
+      .article-section-label {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #c00;
+        margin: 16px 0 8px;
+      }
+
+      h1.article-headline {
+        font-family: Georgia, serif;
+        font-size: 28px;
+        line-height: 1.2;
+        font-weight: 700;
+        margin: 0 0 12px;
+      }
+
+      .article-byline {
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 4px;
+      }
+
+      .article-timestamp {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 16px;
+      }
+
+      .article-hero-image {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        background: #e0e0e0;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .article-image-caption {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+
+      /* ---- Article body ---- */
+      .article-body p {
+        font-size: 18px;
+        line-height: 1.7;
+        margin: 0 0 20px;
+      }
+
+      /* ---- Inline ad wrapper ---- */
+      .ad-inline {
+        width: 100%;
+        margin: 24px 0;
+        min-height: 50px;
+      }
+
+      .ad-label {
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #aaa;
+        text-align: center;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      /* ---- Adhesion (mobile anchor) ---- */
+      .ad-adhesion {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        background: #fff;
+        border-top: 1px solid #e0e0e0;
+        z-index: 9999;
+        padding: 4px 0;
+      }
     </style>
-</head>
-<body>
-    <div class="top-bar">
-        Friday, April 17, 2026 • Da Nang, Vietnam • Test Page with Dummy Embeds
+  </head>
+  <body>
+    <!-- TOP BANNER (masthead) -->
+    <div class="ad-top-banner">
+      <div
+        class="htlad-web-top_banner_masthead"
+        data-unit="phl.news/nation-world/article/top_banner"
+        data-targeting='{"position":"slider","position_type":"slider_section"}'
+      ></div>
     </div>
 
-    <header class="header">
-        <div class="nav-container">
-            <a href="#" class="logo">INQUIRER</a>
-            <div style="display: flex; gap: 25px; font-family: 'Roboto', sans-serif; font-weight: 500;">
-                <a href="#" style="color:#111;text-decoration:none;">NEWS</a>
-                <a href="#" style="color:#111;text-decoration:none;">WEATHER</a>
-                <a href="#" style="color:#111;text-decoration:none;">APPLE NEWS TEST</a>
-            </div>
+    <div class="page-wrapper">
+      <!-- ARTICLE HEADER -->
+      <div class="article-section-label">Nation &amp; World</div>
+
+      <h1 class="article-headline">
+        Iran calls for human chains to protect power plants as Trump's deadline
+        nears
+      </h1>
+
+      <div class="article-byline">
+        By Bassem Mroue, Jon Gambrell, and Samy Magdy, Associated Press
+      </div>
+      <div class="article-timestamp">
+        April 7, 2026, 7:07 a.m. ET · Updated April 7, 2026, 11:02 p.m. ET
+      </div>
+
+      <!-- HERO IMAGE placeholder -->
+      <div
+        class="article-hero-image"
+        role="img"
+        aria-label="Article hero image"
+      ></div>
+      <div class="article-image-caption">
+        Bystanders watch from a distance as rescue teams and first responders
+        work at the site of a strike. Francisco Seco / AP
+      </div>
+
+      <!-- ARTICLE BODY -->
+      <div class="article-body">
+        <p>
+          BEIRUT — Iran on Monday called on citizens to form human chains around
+          nuclear and power installations to deter possible U.S. or Israeli
+          military strikes, as Washington's latest deadline for a nuclear deal
+          drew closer without a resolution.
+        </p>
+
+        <p>
+          Iran's Supreme National Security Council said the country had agreed
+          to a ceasefire and would negotiate with the United States in Islamabad
+          beginning Friday, but tensions remained high over Tehran's nuclear
+          program.
+        </p>
+
+        <p>
+          Supreme Leader Ayatollah Ali Khamenei addressed the nation in a rare
+          public statement, urging Iranians to stand firm against foreign
+          pressure and warning that any military action against Iranian
+          territory would be met with a "decisive response."
+        </p>
+
+        <!-- INLINE AD 1 -->
+        <div class="ad-inline">
+          <div>
+            <span class="ad-label">Advertisement</span>
+            <div
+              class="htlad-web-inline_1_art_dtm"
+              data-unit="phl.news/nation-world/article/inline_1"
+              data-targeting='{"position":"mrec_21","position_type":"mrec_21_article"}'
+            ></div>
+          </div>
         </div>
-    </header>
 
-    <div class="article-container">
-        <article class="main-content">
-            <div class="article-meta">
-                <span>E test</span>
-                <span>by <a href="#" class="author">Author Test</a></span>
-                <span>Published April 10, 2026, 8:53 a.m. ET</span>
-            </div>
+        <p>
+          The call for human shields came as satellite imagery showed increased
+          activity at several Iranian nuclear sites, including Fordow and
+          Natanz, raising fears of an imminent escalation. U.S. officials said
+          negotiations were ongoing but described the situation as "extremely
+          fragile."
+        </p>
 
-            <h1 class="article-title">ETest Apple News onion 041026 regression: loaded with embeds</h1>
-            <h2 style="font-size:24px;margin-bottom:30px;">Pennsylvania hit by E. coli illnesses linked to tainted romaine lettuce from California</h2>
+        <p>
+          President Trump issued a statement from Mar-a-Lago late Sunday
+          reiterating that Iran "cannot be allowed" to obtain a nuclear weapon,
+          and that all options remained on the table. His remarks followed a
+          series of back-channel talks between American and Iranian diplomats in
+          Oman last week.
+        </p>
 
-            <div class="content">
-                <p>Pennsylvania hit by E. coli illnesses linked to tainted romaine lettuce from California content</p>
-                <p>Lorem ipsum dolor sit amet...</p>
+        <p>
+          In Tehran, thousands gathered in public squares following the Supreme
+          Leader's broadcast, with many chanting slogans of support outside the
+          Bushehr nuclear power plant — Iran's only operational civilian
+          reactor. Similar scenes were reported in Mashhad and Isfahan.
+        </p>
 
-                <!-- ==================== DUMMY EMBED 1: YOUTUBE ==================== -->
-                <div class="dummy-embed">
-                    <h4>▶ YOUTUBE EMBED (Dummy - Working)</h4>
-                    <div class="youtube-embed">
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/MEYuDENERcw?si=5yWYBnpg5xGVJ-B_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy YouTube embed – fully functional</small>
-                </div>
+        <!-- INLINE AD 2 -->
+        <div class="ad-inline">
+          <div>
+            <span class="ad-label">Advertisement</span>
+            <div
+              class="htlad-web-inline_2_art_dtm"
+              data-unit="phl.news/nation-world/article/inline_2"
+              data-targeting='{"position":"mrec_22","position_type":"mrec_22_article"}'
+            ></div>
+          </div>
+        </div>
 
-                <!-- ==================== DUMMY EMBED 2: INSTAGRAM ==================== -->
-                <div class="dummy-embed">
-                    <h4>📸 INSTAGRAM EMBED (Dummy)</h4>
-                    <div class="instagram-embed">
-                        <div style="padding:12px;background:#f8f8f8;display:flex;align-items:center;gap:12px;">
-                            <div style="width:40px;height:40px;background:#c8102e;border-radius:50%;"></div>
-                            <div>
-                                <strong>inquirer</strong><br>
-                                <small>View this post on Instagram</small>
-                            </div>
-                        </div>
-                        <div style="height:380px;background:linear-gradient(#fff,#f0f0f0);display:flex;align-items:center;justify-content:center;font-size:90px;color:#ddd;">
-                            📷
-                        </div>
-                        <div style="padding:12px;font-size:14px;">
-                            Beautiful sunset in Da Nang 🌅<br>
-                            <strong>1.2M likes</strong>
-                        </div>
-                    </div>
-                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy Instagram card</small>
-                </div>
+        <p>
+          European allies expressed alarm at the developments, with France,
+          Germany, and the United Kingdom issuing a joint statement calling for
+          "maximum diplomatic restraint" and urging all parties to return to the
+          negotiating table. The European Union's foreign policy chief called
+          for an emergency meeting of the U.N. Security Council.
+        </p>
 
-                <!-- ==================== DUMMY EMBED 3: FACEBOOK ==================== -->
-                <div class="dummy-embed">
-                    <h4>👍 FACEBOOK EMBED (Dummy)</h4>
-                    <div class="facebook-embed">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:40px;height:40px;background:#1877f2;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">I</div>
-                            <div><strong>The Philadelphia Inquirer</strong><br><small>Just now</small></div>
-                        </div>
-                        <p style="margin-bottom:12px;">Breaking: Pennsylvania E. coli outbreak linked to romaine lettuce...</p>
-                        <div style="background:#f0f0f0;height:200px;display:flex;align-items:center;justify-content:center;font-size:60px;color:#1877f2;">📺</div>
-                        <div style="margin-top:10px;color:#1877f2;font-size:14px;">👍 4.8K • 💬 892 • Share</div>
-                    </div>
-                    <small style="display:block;margin-top:8px;text-align:center;color:#666;">Dummy Facebook post</small>
-                </div>       
-                <!-- ==================== ORIGINAL PLACEHOLDERS (kept for regression test) ==================== -->
-                <div class="dummy-embed" style="border-style:dotted;">
-                    <h4>POWA VIDEO EMBED (Placeholder)</h4>
-                    <div id="video-placeholder-0" 
+        <p>
+          Israel, which has repeatedly warned it will not allow Iran to acquire
+          nuclear weapons, did not comment publicly on the latest developments.
+          Israeli media, however, cited unnamed defense officials as saying the
+          military was "monitoring the situation closely."
+        </p>
+
+        <p>
+          The human chain initiative, organized by the Islamic Revolutionary
+          Guard Corps and promoted via state television, is seen by analysts as
+          both a propaganda move and a genuine attempt to complicate targeting
+          decisions for any potential strike. Civilian presence around military
+          and nuclear sites would raise the diplomatic and moral cost of any
+          attack.
+        </p>
+
+        <!-- INLINE AD 3 -->
+        <div class="ad-inline">
+          <div>
+            <span class="ad-label">Advertisement</span>
+            <div
+              class="htlad-web-inline_3_art_dtm"
+              data-unit="phl.news/nation-world/article/inline_3"
+              data-targeting='{"position":"mrec_23","position_type":"mrec_23_article"}'
+            ></div>
+          </div>
+        </div>
+
+        <p>
+          "This is a classic use of human shields, dressed up as civil defense,"
+          said Ariane Tabatabai, a senior fellow at the German Marshall Fund who
+          focuses on Iranian nuclear policy. "It puts any attacking force in an
+          impossible position, and that's exactly the point."
+        </p>
+
+        <p>
+          Iran's foreign minister, Abbas Araghchi, met with the Pakistani
+          foreign minister in Islamabad on Monday ahead of the scheduled talks,
+          signaling that Tehran was still open to diplomacy even as it mobilized
+          citizens domestically. He reiterated Iran's position that it would not
+          negotiate under military threat.
+        </p>
+
+        <p>
+          The Trump administration has set a series of escalating deadlines for
+          Iran to agree to a new nuclear framework, with the latest expiring at
+          the end of the week. Senior officials have said the president is
+          "seriously considering" a military option if diplomacy fails, but has
+          not yet made a final decision.
+        </p>
+
+        <p>
+          Oil markets responded to the tension, with Brent crude rising more
+          than 4% to its highest level in six months. Analysts warned that any
+          military strike near Iranian energy infrastructure could send prices
+          above $120 a barrel and trigger a broader regional conflict.
+        </p>
+
+        <!-- INLINE AD 4 — Interscroll (mobile full-width, tests on mobile view) -->
+        <div class="ad-inline">
+          <div>
+            <span class="ad-label">Advertisement</span>
+            <div
+              class="htlad-web-inline_4_art_dtm"
+              data-unit="phl.news/nation-world/article/inline_4"
+              data-targeting='{"position":"mrec_24","position_type":"mrec_24_article"}'
+            ></div>
+          </div>
+        </div>
+
+        <p>
+          Congressional leaders offered mixed reactions, with Republican hawks
+          backing a tougher stance and moderate Democrats urging the White House
+          to exhaust all diplomatic channels. Senate Majority Leader John Thune
+          said the administration had his "full support" in confronting Iranian
+          nuclear ambitions.
+        </p>
+		
+		<h4>Image</h4>
+        <div id="image-placeholder-0" class="featured-media native-image-placeholder" data-image-url="https://stage.fusion.inquirer.com/resizer/v2/TFD2MVWET6ZFSQ5NPEAKJXIVJM.jpg?auth=59dcaa939198aa3db07e744f88c9e76f4e89fafc37000fb797d37f047f59a945&amp;height=400&amp;width=600&amp;smart=true"
+        data-caption="President Donald Trump speaks during a meeting with Canadian Prime Minister Mark Carney in the Oval Office of the White House, Tuesday, May 6, 2025, in Washington. (AP Photo/Evan Vucci)"
+        data-credits="Evan Vucci"
+        data-image-index="0"
+        data-is-featured="true"
+        data-width="4918.0"
+        data-height="3279.0"
+        style="width:100%;height:300px;">
+		</div>
+
+        <p>
+          The Pentagon declined to detail troop movements or force posture
+          changes in the region, but officials confirmed that the aircraft
+          carrier USS Harry S. Truman remains in the Eastern Mediterranean and
+          that U.S. Air Force assets in Qatar and Bahrain have been placed on
+          elevated readiness.
+        </p>
+		
+		<h4>Video</h4>
+		<div id="video-placeholder-0" 
 					class="featured-media native-video-placeholder" data-video-url="https://d36wdq4x3t6ywe.cloudfront.net/wp-pmn/2019/12/09/5deeb180c9e77c00094dbf8b/5deeb187c9e77c00095e147f_1466500054195-emrowc_t_1575924109328_1280_720_2000.mp4" data-video-image="https://d1dazej9q2gz23.cloudfront.net/01-22-2020/t_a39219be44aa41aeb8ffe8812dca5233_name_5deeb187c9e77c00095e147f_1466500469229_xjc7df_t_1575924109328_1920_1080_5400_.jpg" data-video-index="0"
 				data-video-id="bb4f28f3-f90c-4631-84b4-f7e3f027b3cb"
 				data-video-title="Garland&#39;s video test- updated with new headline"
@@ -205,39 +390,42 @@
             data-dish=""
             data-is-featured="true"
             style="width:100%;height:300px;">
-				</div>
-                </div>
+		</div>
 
-                <div class="dummy-embed" style="border-style:dotted;">
-                    <h4>Galleries</h4>
-                    <div id="gallery-placeholder-71"
+        <p>
+          In Philadelphia, community members with ties to the Iranian diaspora
+          held a candlelight vigil outside City Hall on Sunday evening, calling
+          for peace and opposing military intervention. "Our families are
+          there," said one attendee. "We are begging for diplomacy."
+        </p>
+		
+		<h4>Galleries</h4>
+        <div id="gallery-placeholder-71"
         class="article-gallery native-gallery-placeholder"
         data-gallery-images="[{&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/6RAKN4CH4ZEDHKPUTPX6EMYPZ4.jpg&quot;,&quot;credits&quot;:&quot;Eric Gay \/ AP&quot;,&quot;caption&quot;:&quot;A man wears a face mask as he leaves a business that remains open in downtown San Antonio, Wednesday, April 22, 2020. San Antonio remains under stay-at-home orders due to the COVID-19 outbreak and residents are required to wear face coverings or masks whenever in public. (AP Photo\/Eric Gay)&quot;,&quot;width&quot;:4066,&quot;height&quot;:2425},{&quot;caption&quot;:&quot;People sit outside a soup kitchen waiting their turn to receive free food for their families during a government-ordered lockdown to curb the spread of the new coronavirus, in Buenos Aires, Argentina, Tuesday, April 21, 2020. (AP Photo\/Natacha Pisarenko)&quot;,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/BVKZUIAXENDELJLM3PZIRBU7EI.jpg&quot;,&quot;credits&quot;:&quot;Natacha Pisarenko \/ AP&quot;,&quot;width&quot;:6294,&quot;height&quot;:4097},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington, as Dr. Robert Redfield, director of the Centers for Disease Control and Prevention, listens. (AP Photo\/Alex Brandon)&quot;,&quot;height&quot;:2807,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/BV3FUJCOZ5BN3CD4GJ7TWWRVBE.jpg&quot;,&quot;width&quot;:4210,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington. (AP Photo\/Alex Brandon)&quot;,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;,&quot;width&quot;:4236,&quot;height&quot;:2824,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/PZRH4MNSNFDD3OR6PMZQ4FDLXE.jpg&quot;},{&quot;caption&quot;:&quot;President Donald Trump speaks about the coronavirus in the James Brady Press Briefing Room of the White House, Wednesday, April 22, 2020, in Washington. (AP Photo\/Alex Brandon)&quot;,&quot;height&quot;:2969,&quot;url&quot;:&quot;https:\/\/cloudfront-us-east-1.images.arcpublishing.com\/sandbox.pmn\/JHET72UOCFDSLIRFA5AHIUZDMQ.jpg&quot;,&quot;width&quot;:4454,&quot;credits&quot;:&quot;Alex Brandon \/ AP&quot;}]"
         data-gallery-index="71"
         data-is-featured="false"
         style="width:100%;height:400px;"></div>
-                </div>
+         </div>
 
-                <p>End of embed test section. All dummy embeds added successfully!</p>
-            </div>
-        </article>
-
-        <aside class="sidebar">
-            <h3>Related Test Articles</h3>
-            <ul style="list-style:none;line-height:2.2;">
-                <li><a href="#" style="color:#c8102e;">Testing standout box</a></li>
-                <li><a href="#" style="color:#c8102e;">Vance's test Vox AI2HTML</a></li>
-            </ul>
-        </aside>
+        <p>
+          As the week began with no breakthrough in sight, the world watched to
+          see whether the latest round of talks in Islamabad would produce the
+          framework agreement that negotiators on both sides say is within reach
+          — or whether the standoff would tip toward confrontation.
+        </p>
+      </div>
+      <!-- .article-body -->
     </div>
+    <!-- .page-wrapper -->
 
-    <footer style="background:#111;color:#ccc;padding:60px 20px 30px;text-align:center;margin-top:80px;">
-        <p>© 2026 Inquirer Fusion Dev Test • Hello Apple 20260410 Clone with Dummy Embeds</p>
-        <p style="margin-top:15px;font-size:13px;">✅ YouTube, Vimeo, Instagram-style, Facebook-style dummy embeds added and working.</p>
-    </footer>
-
-    <script>
-        console.log('%c✅ Dummy embeds successfully added and loaded!', 'background:#c8102e;color:#fff;padding:5px 10px;border-radius:4px;font-size:16px');
-    </script>
-</body>
+    <!-- ADHESION (mobile anchor) — article/anchor -->
+    <div class="ad-adhesion">
+      <div
+        class="htlad-web-adhesion_art_tm"
+        data-unit="phl.news/nation-world/article/adhesion"
+        data-targeting='{"position":"slider","position_type":"slider_article"}'
+      ></div>
+    </div>
+  </body>
 </html>
